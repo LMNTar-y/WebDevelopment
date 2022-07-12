@@ -1,4 +1,4 @@
-﻿namespace WebDevelopment.API
+﻿namespace WebDevelopment.API.Model
 {
     public class User
     {

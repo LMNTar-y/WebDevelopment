@@ -1,6 +1,11 @@
 ﻿using System.Data.SqlClient;
 using Dapper;
+using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
+using WebDevelopment.API.Middleware;
+using WebDevelopment.API.Model;
+using WebDevelopment.API.Model.Validators;
 
 namespace WebDevelopment.API.Controllers;
 
@@ -8,11 +13,13 @@ namespace WebDevelopment.API.Controllers;
 [ApiController]
 public class UserController : ControllerBase
 {
+    private readonly IValidator<User> _validator;
     private readonly string _connectionString;
 
-    public UserController(IConfiguration configuration)
+    public UserController(IConfiguration configuration, IValidator<User> validator)
     {
         _connectionString = configuration["ConnectionStrings:DefaultConnection"];
+        _validator = validator;
     }
 
     [HttpGet()]
@@ -58,13 +65,21 @@ public class UserController : ControllerBase
     }
 
     [HttpPost()]
-    public ActionResult CreateNewUser([FromBody] User user)
+    public async Task<ActionResult> CreateNewUserAsync([FromBody] User newUser)
     {
-        using (var connection =
+        ValidationResult result = await _validator.ValidateAsync(newUser);
+
+        if (!result.IsValid)
+        {
+            result.AddToModelState(this.ModelState);
+            throw new AppException("newUser object did not pass validation");
+        }
+
+        await using (var connection =
                new SqlConnection(_connectionString))
         {
             var sqlExpression = "INSERT INTO Users (Name, Surname, Email) VALUES (@Name, @Surname, @Email)";
-            connection.Execute(sqlExpression, new { Name = user.Name, Surname = user.Surname, Email = user.Email });
+            await connection.ExecuteAsync(sqlExpression, new { newUser.Name, newUser.Surname, newUser.Email });
         }
 
         return Ok();
