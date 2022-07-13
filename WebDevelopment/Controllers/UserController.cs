@@ -1,11 +1,7 @@
-﻿using System.Data.SqlClient;
-using Dapper;
-using FluentValidation;
-using FluentValidation.Results;
+﻿using javax.xml.ws;
 using Microsoft.AspNetCore.Mvc;
-using WebDevelopment.API.Middleware;
 using WebDevelopment.API.Model;
-using WebDevelopment.API.Model.Validators;
+using WebDevelopment.API.Services;
 
 namespace WebDevelopment.API.Controllers;
 
@@ -13,74 +9,43 @@ namespace WebDevelopment.API.Controllers;
 [ApiController]
 public class UserController : ControllerBase
 {
-    private readonly IValidator<User> _validator;
-    private readonly string _connectionString;
+    private readonly IUserService _userService;
 
-    public UserController(IConfiguration configuration, IValidator<User> validator)
+    public UserController(IUserService userService)
     {
-        _connectionString = configuration["ConnectionStrings:DefaultConnection"];
-        _validator = validator;
+        _userService = userService;
     }
 
     [HttpGet()]
-    public IEnumerable<User> GetAllUsers()
+    public IEnumerable<NewUserRequest> GetAllUsers()
     {
-        List<User> users;
-        using (var connection =
-               new SqlConnection(_connectionString))
-        {
-            var sqlExpression = "SELECT * FROM Users";
-            users = connection.Query<User>(sqlExpression).ToList();
-        }
-
-        return users;
+        return _userService.GetAllUsers();
     }
 
     [HttpGet("{id:int}")]
-    public User GetUserById(int id)
+    public NewUserRequest GetUserById(int id)
     {
-        User user;
-        using (var connection =
-               new SqlConnection(_connectionString))
-        {
-            var sqlExpression = "SELECT * FROM Users WHERE Id = @Id";
-            user = connection.QueryFirstOrDefault<User>(sqlExpression, new { Id = id });
-        }
-
-        return user;
+        return _userService.GetUserById(id);
     }
 
     [HttpGet("{userEmail}")]
-    public User GetUserByEmail(string userEmail)
+    public NewUserRequest GetUserByEmail(string userEmail)
     {
-        User user;
-        using (var connection =
-               new SqlConnection(_connectionString))
-        {
-            var sqlExpression = "SELECT * FROM Users WHERE Email = @Email";
-            user = connection.QueryFirstOrDefault<User>(sqlExpression, new { Email = userEmail });
-        }
-
-        return user;
+        return _userService.GetUserByEmail(userEmail);
     }
 
     [HttpPost()]
-    public async Task<ActionResult> CreateNewUserAsync([FromBody] User newUser)
+    public async Task<ActionResult> SaveAsync([FromBody] NewUserRequest userRequest)
     {
-        ValidationResult result = await _validator.ValidateAsync(newUser);
+        await _userService.CreateNewUserAsync(userRequest);
 
-        if (!result.IsValid)
-        {
-            result.AddToModelState(this.ModelState);
-            throw new AppException("newUser object did not pass validation");
-        }
+        return Ok();
+    }
 
-        await using (var connection =
-               new SqlConnection(_connectionString))
-        {
-            var sqlExpression = "INSERT INTO Users (Name, Surname, Email) VALUES (@Name, @Surname, @Email)";
-            await connection.ExecuteAsync(sqlExpression, new { newUser.Name, newUser.Surname, newUser.Email });
-        }
+    [HttpPut()]
+    public async Task<ActionResult> UpdateAsync([FromBody] UpdateUserRequest userRequest)
+    {
+        await _userService.UpdateNewUserAsync(userRequest);
 
         return Ok();
     }

@@ -1,8 +1,9 @@
 using FluentValidation;
-using WebDevelopment.API.Controllers;
+using FluentValidation.AspNetCore;
 using WebDevelopment.API.Middleware;
 using WebDevelopment.API.Model;
 using WebDevelopment.API.Model.Validators;
+using WebDevelopment.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +14,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<IValidator<User>, UserValidator>();
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddScoped<IValidator<NewUserRequest>, BaseUserValidator>();
+builder.Services.AddScoped<IValidator<UpdateUserRequest>, UpdateUserRequestValidator>();
+builder.Services.AddTransient<IUserService, UserService>();
 
 
 var app = builder.Build();
