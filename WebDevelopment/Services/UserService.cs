@@ -59,18 +59,18 @@ public class UserService : IUserService
         {
             var sqlExpression = "INSERT INTO Users (FirstName, SecondName, UserEmail) VALUES (@Name, @Surname, @Email)";
             await connection.ExecuteAsync(sqlExpression,
-                new { userRequest.Name, userRequest.Surname, userRequest.Email });
+                new { userRequest.FirstName, userRequest.SecondName, userRequest.UserEmail });
         }
     }
 
-    public async Task UpdateNewUserAsync(UpdateUserRequest userRequest)
+    public async Task UpdateUserAsync(UpdateUserRequest userRequest)
     {
         await using (var connection =
                      new SqlConnection(_connectionString))
         {
             var sqlExpression = "UPDATE Users SET FirstName = @Name, SecondName = @Surname, UserEmail = @Email WHERE Id = @Id";
             await connection.ExecuteAsync(sqlExpression,
-                new { userRequest.Id, userRequest.Name, userRequest.Surname, userRequest.Email });
+                new { userRequest.Id, userRequest.FirstName, userRequest.SecondName, userRequest.UserEmail });
         }
     }
 }

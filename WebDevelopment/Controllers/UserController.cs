@@ -45,7 +45,7 @@ public class UserController : ControllerBase
     [HttpPut()]
     public async Task<ActionResult> UpdateAsync([FromBody] UpdateUserRequest userRequest)
     {
-        await _userService.UpdateNewUserAsync(userRequest);
+        await _userService.UpdateUserAsync(userRequest);
 
         return Ok();
     }

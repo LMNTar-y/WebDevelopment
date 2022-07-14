@@ -2,7 +2,9 @@
 
 public interface IUserRequest
 {
-    public string? Name { get; set; }
-    public string? Surname { get; set; }
-    public string? Email { get; set; }
+    public string? FirstName { get; set; }
+    
+    public string? SecondName { get; set; }
+    
+    public string? UserEmail { get; set; }
 }
