@@ -1,6 +1,8 @@
 using System.Net;
 using System.Text;
 using System.Text.Json;
+using FluentValidation.Validators;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,7 +10,7 @@ using Moq;
 using WebDevelopment.API.Model;
 using WebDevelopment.API.Services;
 
-namespace WebDevelopment.API.Tests;
+namespace WebDevelopment.API.Tests.IntegrationTests;
 
 public class UserControllerTests
 {
@@ -20,11 +22,19 @@ public class UserControllerTests
     {
         _userServiceMock.Setup(us => us.UpdateUserAsync(It.IsAny<UpdateUserRequest>()));
         _userServiceMock.Setup(us => us.CreateNewUserAsync(It.IsAny<NewUserRequest>()));
+        _userServiceMock.Setup(us => us.GetUserById(It.Is<int>(i => i > 0))).Returns(() => new NewUserRequest());
+        _userServiceMock.Setup(us => us.GetUserByEmail(It.IsAny<string>())).Returns(() => new NewUserRequest());
+        _userServiceMock.Setup(us => us.GetAllUsers()).Returns(() => new List<NewUserRequest>());
         _client = _factory.WithWebHostBuilder(
                 builder => builder.ConfigureTestServices(
-                    services => services.AddTransient(_ => _userServiceMock.Object)))
+                    services =>
+                    {
+                        services.AddTransient(_ => _userServiceMock.Object);
+                        services.AddAuthentication("Test")
+                            .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("Test", _ => { });
+                    }))
             .CreateClient();
-        _client.BaseAddress = new Uri("https://localhost:7087/api/User/");
+        _client.BaseAddress = new Uri("https://localhost/api/User/");
     }
 
     [Theory]
@@ -33,18 +43,14 @@ public class UserControllerTests
     [InlineData("test@example.com")]
     public async Task GetRequests_ReturnSuccess(string url)
     {
-        // Arrange
-        var application = new WebApplicationFactory<Program>();
-        var httpClient = application.CreateClient();
-        httpClient.BaseAddress = new Uri("https://localhost:7087/api/User/");
 
         //Act
-        var response = await httpClient.GetAsync(url);
+        var response = await _client.GetAsync(url);
 
         //Assert
-        response.EnsureSuccessStatusCode();
-        Assert.Equal("application/json; charset=utf-8",
-            response.Content.Headers.ContentType?.ToString());
+        Assert.NotNull(response);
+        Assert.NotNull(response.Content);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
     [Fact]
@@ -71,6 +77,8 @@ public class UserControllerTests
             new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json"));
 
         //Assert
+        Assert.NotNull(response);
+        Assert.NotNull(response.Content);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
@@ -83,6 +91,8 @@ public class UserControllerTests
             new StringContent(JsonSerializer.Serialize(new UpdateUserRequest()), Encoding.UTF8, "application/json"));
 
         //Assert
+        Assert.NotNull(response);
+        Assert.NotNull(response.Content);
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
@@ -91,13 +101,15 @@ public class UserControllerTests
     {
         // Arrange
         var user = new UpdateUserRequest()
-            { Id = 1, FirstName = "Test", SecondName = "Test", UserEmail = "test@test.test" };
+        { Id = 1, FirstName = "Test", SecondName = "Test", UserEmail = "test@test.test" };
 
         //Act
         var response = await _client.PutAsync("",
             new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json"));
 
         //Assert
+        Assert.NotNull(response);
+        Assert.NotNull(response.Content);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 }
