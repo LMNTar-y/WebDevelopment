@@ -1,4 +1,4 @@
-﻿using javax.xml.ws;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebDevelopment.API.Model;
 using WebDevelopment.API.Services;
@@ -7,6 +7,7 @@ namespace WebDevelopment.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class UserController : ControllerBase
 {
     private readonly IUserService _userService;
@@ -16,7 +17,7 @@ public class UserController : ControllerBase
         _userService = userService;
     }
 
-    [HttpGet()]
+    [HttpGet]
     public IEnumerable<NewUserRequest> GetAllUsers()
     {
         return _userService.GetAllUsers();
@@ -34,7 +35,7 @@ public class UserController : ControllerBase
         return _userService.GetUserByEmail(userEmail);
     }
 
-    [HttpPost()]
+    [HttpPost]
     public async Task<ActionResult> SaveAsync([FromBody] NewUserRequest userRequest)
     {
         await _userService.CreateNewUserAsync(userRequest);
@@ -42,7 +43,7 @@ public class UserController : ControllerBase
         return Ok();
     }
 
-    [HttpPut()]
+    [HttpPut]
     public async Task<ActionResult> UpdateAsync([FromBody] UpdateUserRequest userRequest)
     {
         await _userService.UpdateUserAsync(userRequest);
