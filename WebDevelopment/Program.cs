@@ -1,11 +1,13 @@
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using WebDevelopment.API.Middleware;
 using WebDevelopment.API.Model;
 using WebDevelopment.API.Model.Validators;
 using WebDevelopment.API.Security;
 using WebDevelopment.API.Services;
+using WebDevelopment.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +16,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddDbContext<WebDevelopmentContext>(options =>
+    options.UseSqlServer(builder.Configuration["ConnectionStrings:DefaultConnection"]));
+
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
