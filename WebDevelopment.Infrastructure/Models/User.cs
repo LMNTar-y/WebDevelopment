@@ -6,6 +6,7 @@
         {
             UserPositions = new HashSet<UserPosition>();
             UsersSalaries = new HashSet<UsersSalary>();
+            UserTasks = new HashSet<UserTask>();
         }
 
         public int Id { get; set; }
@@ -16,5 +17,6 @@
 
         public virtual ICollection<UserPosition> UserPositions { get; set; }
         public virtual ICollection<UsersSalary> UsersSalaries { get; set; }
+        public virtual ICollection<UserTask> UserTasks { get; set; }
     }
 }

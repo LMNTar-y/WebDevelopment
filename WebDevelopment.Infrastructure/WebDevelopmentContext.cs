@@ -21,6 +21,8 @@ namespace WebDevelopment.Infrastructure
         public virtual DbSet<User> Users { get; set; } = null!;
         public virtual DbSet<UserPosition> UserPositions { get; set; } = null!;
         public virtual DbSet<UsersSalary> UsersSalaries { get; set; } = null!;
+        public virtual DbSet<Models.Task> Tasks { get; set; } = null!;
+        public virtual DbSet<UserTask> UserTasks { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -119,6 +121,30 @@ namespace WebDevelopment.Infrastructure
                     .WithMany(p => p.UsersSalaries)
                     .HasForeignKey(d => d.UserId)
                     .HasConstraintName("FK__UsersSala__UserI__440B1D61");
+            });
+
+            modelBuilder.Entity<Models.Task>(entity =>
+            {
+                entity.Property(e => e.Name).HasMaxLength(255);
+
+                entity.Property(e => e.CreationDate).HasDefaultValueSql("(sysdatetimeoffset())");
+
+            });
+
+            modelBuilder.Entity<UserTask>(entity =>
+            {
+                entity.Property(e => e.StartDate).HasDefaultValueSql("(sysdatetimeoffset())");
+                entity.Property(e => e.ValidTill).HasDefaultValueSql("DATEADD(day, 7, sysdatetimeoffset())");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.UserTasks)
+                    .HasForeignKey(d => d.UserId)
+                    .HasConstraintName("FK_UserTasks_Users_UserId");
+
+                entity.HasOne(d => d.Task)
+                    .WithMany(p => p.UserTasks)
+                    .HasForeignKey(d => d.TaskId)
+                    .HasConstraintName("FK_UserTasks_Tasks_TaskId");
             });
 
             OnModelCreatingPartial(modelBuilder);
