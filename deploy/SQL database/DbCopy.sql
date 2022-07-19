@@ -1,0 +1,307 @@
+USE [master]
+GO
+/****** Object:  Database [WebDevelopment]    Script Date: 19.07.2022 14:04:32 ******/
+CREATE DATABASE [WebDevelopment]
+ CONTAINMENT = NONE
+ ON  PRIMARY 
+( NAME = N'WebDevelopment', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL15.MSSQLSERVER\MSSQL\DATA\WebDevelopment.mdf' , SIZE = 8192KB , MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
+ LOG ON 
+( NAME = N'WebDevelopment_log', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL15.MSSQLSERVER\MSSQL\DATA\WebDevelopment_log.ldf' , SIZE = 8192KB , MAXSIZE = 2048GB , FILEGROWTH = 65536KB )
+ WITH CATALOG_COLLATION = DATABASE_DEFAULT
+GO
+ALTER DATABASE [WebDevelopment] SET COMPATIBILITY_LEVEL = 150
+GO
+IF (1 = FULLTEXTSERVICEPROPERTY('IsFullTextInstalled'))
+begin
+EXEC [WebDevelopment].[dbo].[sp_fulltext_database] @action = 'enable'
+end
+GO
+ALTER DATABASE [WebDevelopment] SET ANSI_NULL_DEFAULT OFF 
+GO
+ALTER DATABASE [WebDevelopment] SET ANSI_NULLS OFF 
+GO
+ALTER DATABASE [WebDevelopment] SET ANSI_PADDING OFF 
+GO
+ALTER DATABASE [WebDevelopment] SET ANSI_WARNINGS OFF 
+GO
+ALTER DATABASE [WebDevelopment] SET ARITHABORT OFF 
+GO
+ALTER DATABASE [WebDevelopment] SET AUTO_CLOSE OFF 
+GO
+ALTER DATABASE [WebDevelopment] SET AUTO_SHRINK OFF 
+GO
+ALTER DATABASE [WebDevelopment] SET AUTO_UPDATE_STATISTICS ON 
+GO
+ALTER DATABASE [WebDevelopment] SET CURSOR_CLOSE_ON_COMMIT OFF 
+GO
+ALTER DATABASE [WebDevelopment] SET CURSOR_DEFAULT  GLOBAL 
+GO
+ALTER DATABASE [WebDevelopment] SET CONCAT_NULL_YIELDS_NULL OFF 
+GO
+ALTER DATABASE [WebDevelopment] SET NUMERIC_ROUNDABORT OFF 
+GO
+ALTER DATABASE [WebDevelopment] SET QUOTED_IDENTIFIER OFF 
+GO
+ALTER DATABASE [WebDevelopment] SET RECURSIVE_TRIGGERS OFF 
+GO
+ALTER DATABASE [WebDevelopment] SET  DISABLE_BROKER 
+GO
+ALTER DATABASE [WebDevelopment] SET AUTO_UPDATE_STATISTICS_ASYNC OFF 
+GO
+ALTER DATABASE [WebDevelopment] SET DATE_CORRELATION_OPTIMIZATION OFF 
+GO
+ALTER DATABASE [WebDevelopment] SET TRUSTWORTHY OFF 
+GO
+ALTER DATABASE [WebDevelopment] SET ALLOW_SNAPSHOT_ISOLATION OFF 
+GO
+ALTER DATABASE [WebDevelopment] SET PARAMETERIZATION SIMPLE 
+GO
+ALTER DATABASE [WebDevelopment] SET READ_COMMITTED_SNAPSHOT OFF 
+GO
+ALTER DATABASE [WebDevelopment] SET HONOR_BROKER_PRIORITY OFF 
+GO
+ALTER DATABASE [WebDevelopment] SET RECOVERY FULL 
+GO
+ALTER DATABASE [WebDevelopment] SET  MULTI_USER 
+GO
+ALTER DATABASE [WebDevelopment] SET PAGE_VERIFY CHECKSUM  
+GO
+ALTER DATABASE [WebDevelopment] SET DB_CHAINING OFF 
+GO
+ALTER DATABASE [WebDevelopment] SET FILESTREAM( NON_TRANSACTED_ACCESS = OFF ) 
+GO
+ALTER DATABASE [WebDevelopment] SET TARGET_RECOVERY_TIME = 60 SECONDS 
+GO
+ALTER DATABASE [WebDevelopment] SET DELAYED_DURABILITY = DISABLED 
+GO
+ALTER DATABASE [WebDevelopment] SET ACCELERATED_DATABASE_RECOVERY = OFF  
+GO
+EXEC sys.sp_db_vardecimal_storage_format N'WebDevelopment', N'ON'
+GO
+ALTER DATABASE [WebDevelopment] SET QUERY_STORE = OFF
+GO
+USE [WebDevelopment]
+GO
+/****** Object:  Table [dbo].[__EFMigrationsHistory]    Script Date: 19.07.2022 14:04:32 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[__EFMigrationsHistory](
+	[MigrationId] [nvarchar](150) NOT NULL,
+	[ProductVersion] [nvarchar](32) NOT NULL,
+ CONSTRAINT [PK___EFMigrationsHistory] PRIMARY KEY CLUSTERED 
+(
+	[MigrationId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Country]    Script Date: 19.07.2022 14:04:32 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Country](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Name] [nvarchar](255) NULL,
+	[Alpha3Code] [nvarchar](10) NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Departments]    Script Date: 19.07.2022 14:04:32 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Departments](
+	[Id] [uniqueidentifier] NOT NULL,
+	[Name] [nvarchar](255) NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Positions]    Script Date: 19.07.2022 14:04:32 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Positions](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Name] [nvarchar](255) NULL,
+	[ShortName] [nvarchar](255) NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[SalaryRange]    Script Date: 19.07.2022 14:04:32 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[SalaryRange](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[StartRange] [decimal](18, 2) NULL,
+	[FinishRange] [decimal](18, 2) NULL,
+	[PositionId] [int] NULL,
+	[CountryID] [int] NULL,
+	[CreationDate] [datetimeoffset](7) NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Tasks]    Script Date: 19.07.2022 14:04:32 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Tasks](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Name] [nvarchar](255) NULL,
+	[Description] [nvarchar](max) NULL,
+	[CreationDate] [datetimeoffset](7) NULL,
+ CONSTRAINT [PK_Tasks] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[UserPositions]    Script Date: 19.07.2022 14:04:32 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[UserPositions](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[UserId] [int] NULL,
+	[PositionId] [int] NULL,
+	[DepartmentId] [uniqueidentifier] NULL,
+	[StartDate] [datetimeoffset](7) NULL,
+	[EndDate] [datetimeoffset](7) NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Users]    Script Date: 19.07.2022 14:04:32 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Users](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[FirstName] [nvarchar](255) NULL,
+	[SecondName] [nvarchar](255) NULL,
+	[UserEmail] [nvarchar](255) NULL,
+	[Active] [bit] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[UsersSalary]    Script Date: 19.07.2022 14:04:32 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[UsersSalary](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Salary] [decimal](18, 2) NULL,
+	[UserId] [int] NULL,
+	[ChangeTime] [datetimeoffset](7) NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[UserTasks]    Script Date: 19.07.2022 14:04:32 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[UserTasks](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[TaskId] [int] NOT NULL,
+	[UserId] [int] NOT NULL,
+	[StartDate] [datetimeoffset](7) NULL,
+	[FinishDate] [datetimeoffset](7) NULL,
+	[ValidTill] [datetimeoffset](7) NULL,
+ CONSTRAINT [PK_UserTasks] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Index [IX_UserTasks_TaskId]    Script Date: 19.07.2022 14:04:32 ******/
+CREATE NONCLUSTERED INDEX [IX_UserTasks_TaskId] ON [dbo].[UserTasks]
+(
+	[TaskId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+/****** Object:  Index [IX_UserTasks_UserId]    Script Date: 19.07.2022 14:04:32 ******/
+CREATE NONCLUSTERED INDEX [IX_UserTasks_UserId] ON [dbo].[UserTasks]
+(
+	[UserId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[Departments] ADD  DEFAULT (newid()) FOR [Id]
+GO
+ALTER TABLE [dbo].[SalaryRange] ADD  DEFAULT (sysdatetimeoffset()) FOR [CreationDate]
+GO
+ALTER TABLE [dbo].[Tasks] ADD  DEFAULT (sysdatetimeoffset()) FOR [CreationDate]
+GO
+ALTER TABLE [dbo].[UserPositions] ADD  DEFAULT (sysdatetimeoffset()) FOR [StartDate]
+GO
+ALTER TABLE [dbo].[Users] ADD  CONSTRAINT [df_Active]  DEFAULT ((1)) FOR [Active]
+GO
+ALTER TABLE [dbo].[UsersSalary] ADD  DEFAULT (sysdatetimeoffset()) FOR [ChangeTime]
+GO
+ALTER TABLE [dbo].[UserTasks] ADD  DEFAULT (sysdatetimeoffset()) FOR [StartDate]
+GO
+ALTER TABLE [dbo].[UserTasks] ADD  DEFAULT (dateadd(day,(7),sysdatetimeoffset())) FOR [ValidTill]
+GO
+ALTER TABLE [dbo].[SalaryRange]  WITH CHECK ADD FOREIGN KEY([CountryID])
+REFERENCES [dbo].[Country] ([Id])
+GO
+ALTER TABLE [dbo].[SalaryRange]  WITH CHECK ADD FOREIGN KEY([PositionId])
+REFERENCES [dbo].[Positions] ([Id])
+GO
+ALTER TABLE [dbo].[UserPositions]  WITH CHECK ADD FOREIGN KEY([DepartmentId])
+REFERENCES [dbo].[Departments] ([Id])
+GO
+ALTER TABLE [dbo].[UserPositions]  WITH CHECK ADD FOREIGN KEY([PositionId])
+REFERENCES [dbo].[Positions] ([Id])
+GO
+ALTER TABLE [dbo].[UserPositions]  WITH CHECK ADD FOREIGN KEY([UserId])
+REFERENCES [dbo].[Users] ([Id])
+GO
+ALTER TABLE [dbo].[UsersSalary]  WITH CHECK ADD FOREIGN KEY([UserId])
+REFERENCES [dbo].[Users] ([Id])
+GO
+ALTER TABLE [dbo].[UserTasks]  WITH CHECK ADD  CONSTRAINT [FK_UserTasks_Tasks_TaskId] FOREIGN KEY([TaskId])
+REFERENCES [dbo].[Tasks] ([Id])
+ON DELETE CASCADE
+GO
+ALTER TABLE [dbo].[UserTasks] CHECK CONSTRAINT [FK_UserTasks_Tasks_TaskId]
+GO
+ALTER TABLE [dbo].[UserTasks]  WITH CHECK ADD  CONSTRAINT [FK_UserTasks_Users_UserId] FOREIGN KEY([UserId])
+REFERENCES [dbo].[Users] ([Id])
+ON DELETE CASCADE
+GO
+ALTER TABLE [dbo].[UserTasks] CHECK CONSTRAINT [FK_UserTasks_Users_UserId]
+GO
+USE [master]
+GO
+ALTER DATABASE [WebDevelopment] SET  READ_WRITE 
+GO
