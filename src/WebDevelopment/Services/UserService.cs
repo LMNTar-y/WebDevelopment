@@ -22,7 +22,7 @@ public class UserService : IUserService
             var sqlExpression = "SELECT * FROM Users";
             users = connection.Query<NewUserRequest>(sqlExpression).ToList();
         }
-
+        
         return users;
     }
 
@@ -59,7 +59,7 @@ public class UserService : IUserService
         {
             var sqlExpression = "INSERT INTO Users (FirstName, SecondName, UserEmail) VALUES (@Name, @Surname, @Email)";
             await connection.ExecuteAsync(sqlExpression,
-                new { userRequest.FirstName, userRequest.SecondName, userRequest.UserEmail });
+                new { Name = userRequest.FirstName, Surname = userRequest.SecondName, Email = userRequest.UserEmail });
         }
     }
 

@@ -7,6 +7,10 @@ using WebDevelopment.API.Model;
 using WebDevelopment.API.Model.Validators;
 using WebDevelopment.API.Security;
 using WebDevelopment.API.Services;
+using WebDevelopment.HostClient;
+using WebDevelopment.HostClient.Implementation;
+using WebDevelopment.HostClient.Interfaces;
+using WebDevelopment.HostClient.Model;
 using WebDevelopment.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,8 +21,10 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.AddDbContext<WebDevelopmentContext>(options =>
-    options.UseSqlServer(builder.Configuration["ConnectionStrings:DefaultConnection"]));
+builder.Services.AddDbContext<WebDevelopmentContext>(
+    options =>
+    options.UseSqlServer(builder.Configuration["ConnectionStrings:DefaultConnection"])
+    );
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -59,7 +65,15 @@ builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddScoped<IValidator<NewUserRequest>, BaseUserValidator>();
 builder.Services.AddScoped<IValidator<UpdateUserRequest>, UpdateUserRequestValidator>();
 builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddTransient<ISenderClient, EmailClient>();
+builder.Services.AddTransient<ITaskExpirationWorker, TaskExpirationWorker>();
+builder.Services.AddCronJob<TaskExpirationNotificationService>(c =>
+{
+    c.TimeZoneInfo = TimeZoneInfo.Local;
+    c.CronExpression = builder.Configuration["Crone:SendEmailPeriod"];
+});
 
+builder.Services.Configure<SmtpClientSetups>(builder.Configuration.GetSection(nameof(SmtpClientSetups)));
 
 var app = builder.Build();
 
