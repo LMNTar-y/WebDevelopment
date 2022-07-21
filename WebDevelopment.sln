@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebDevelopment.API", "src\W
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebDevelopment.Infrastructure", "src\WebDevelopment.Infrastructure\WebDevelopment.Infrastructure.csproj", "{E631FC2A-1C99-4EB0-9C82-58F96532FE27}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebDevelopment.HostClient", "src\WebDevelopment.HostClient\WebDevelopment.HostClient.csproj", "{7ED79520-CC2C-4AB9-B507-6A117B5821FA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebDevelopment.HostClient", "src\WebDevelopment.HostClient\WebDevelopment.HostClient.csproj", "{7ED79520-CC2C-4AB9-B507-6A117B5821FA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebDevelopment.HostClient.Tests", "Tests\WebDevelopment.HostClient.Tests\WebDevelopment.HostClient.Tests.csproj", "{AEE196E7-8B4D-449F-8674-5333722096CE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{7ED79520-CC2C-4AB9-B507-6A117B5821FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7ED79520-CC2C-4AB9-B507-6A117B5821FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7ED79520-CC2C-4AB9-B507-6A117B5821FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AEE196E7-8B4D-449F-8674-5333722096CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AEE196E7-8B4D-449F-8674-5333722096CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AEE196E7-8B4D-449F-8674-5333722096CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AEE196E7-8B4D-449F-8674-5333722096CE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

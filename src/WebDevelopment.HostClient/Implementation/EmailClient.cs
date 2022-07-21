@@ -1,6 +1,8 @@
 ﻿using System.Net;
 using System.Net.Mail;
+using System.Text.RegularExpressions;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using WebDevelopment.HostClient.Interfaces;
 using WebDevelopment.HostClient.Model;
 
@@ -9,10 +11,15 @@ namespace WebDevelopment.HostClient.Implementation;
 public class EmailClient : ISenderClient
 {
     private readonly SmtpClientSetups _configurations;
+    private readonly ILogger<EmailClient> _logger;
     private SmtpClient? _smtpClient;
+    const string EmailPattern = @"^(?("")(""[^""]+?""@)|(([0-9a-z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)(?<=[0-9a-z])@))" +
+                               @"(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-z][-\w]*[0-9a-z]*\.)+[a-z0-9]{2,17}))$";
 
-    public EmailClient(IOptions<SmtpClientSetups> configurations)
+    public EmailClient(IOptions<SmtpClientSetups> configurations, ILogger<EmailClient> logger)
     {
+        _logger = logger;
+        if (configurations == null) throw new ArgumentNullException(nameof(configurations), $"{configurations} was not loaded from DI");
         _configurations = configurations.Value;
     }
 
@@ -20,8 +27,16 @@ public class EmailClient : ISenderClient
     {
         try
         {
-            if (!(emailsToSend?.Count > 0) || _configurations?.EmailSendFrom == null ||
-                _configurations.EmailPassword == null || _configurations.EncryptionKey == null) return;
+            if (emailsToSend == null || emailsToSend.Count < 1)
+            {
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(_configurations?.EmailSendFrom) ||
+                string.IsNullOrWhiteSpace(_configurations.EmailPassword) || string.IsNullOrWhiteSpace(_configurations.EncryptionKey) || _configurations.SmtpPort < 0)
+            {
+                throw new ArgumentException("Incorrect data in the SmtpClientSetups configurations");
+            }
 
             using (_smtpClient = new SmtpClient(_configurations.SmtpHost, _configurations.SmtpPort))
             {
@@ -34,6 +49,12 @@ public class EmailClient : ISenderClient
 
                 foreach (var email in emailsToSend)
                 {
+                    if (!Regex.IsMatch(email, EmailPattern, RegexOptions.IgnoreCase))
+                    {
+                        _logger.LogWarning("Incorrect email in dataBase - {0}", email);
+                        continue;
+                    }
+
                     var to = new MailAddress(email);
                     using (var message = new MailMessage(from, to))
                     {
@@ -46,9 +67,10 @@ public class EmailClient : ISenderClient
                 }
             }
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            Console.WriteLine(e);
+            _logger.LogCritical(ex, "EmailClient - SendNotification - {0}",
+                ex.ToString());
             throw;
         }
     }

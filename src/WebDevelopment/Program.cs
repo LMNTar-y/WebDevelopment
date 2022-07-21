@@ -73,6 +73,13 @@ builder.Services.AddCronJob<TaskExpirationNotificationService>(c =>
     c.CronExpression = builder.Configuration["Crone:SendEmailPeriod"];
 });
 
+builder.Services.AddLogging(loggingBuilder =>
+{
+    loggingBuilder.ClearProviders();
+    loggingBuilder.SetMinimumLevel(LogLevel.Trace);
+    loggingBuilder.AddLog4Net("log4net.config");
+});
+
 builder.Services.Configure<SmtpClientSetups>(builder.Configuration.GetSection(nameof(SmtpClientSetups)));
 
 var app = builder.Build();
