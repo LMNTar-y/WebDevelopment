@@ -146,10 +146,6 @@ namespace WebDevelopment.Infrastructure
                     .HasForeignKey(d => d.TaskId)
                     .HasConstraintName("FK_UserTasks_Tasks_TaskId");
             });
-
-            OnModelCreatingPartial(modelBuilder);
         }
-
-        partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
     }
 }
