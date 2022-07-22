@@ -7,9 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Cronos" Version="0.7.1" />
     <PackageReference Include="log4net" Version="2.0.14" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
+    <PackageReference Include="Quartz" Version="3.4.0" />
   </ItemGroup>
 
   <ItemGroup>

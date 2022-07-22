@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using WebDevelopment.HostClient.Interfaces;
 using WebDevelopment.HostClient.Model;
+using WebDevelopment.HostClient.Security;
 
 namespace WebDevelopment.HostClient.Implementation;
 

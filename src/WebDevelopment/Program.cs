@@ -2,6 +2,7 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using Quartz;
 using WebDevelopment.API.Middleware;
 using WebDevelopment.API.Model;
 using WebDevelopment.API.Model.Validators;
@@ -12,6 +13,7 @@ using WebDevelopment.HostClient.Implementation;
 using WebDevelopment.HostClient.Interfaces;
 using WebDevelopment.HostClient.Model;
 using WebDevelopment.Infrastructure;
+using WebDevelopment.API.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -67,11 +69,15 @@ builder.Services.AddScoped<IValidator<UpdateUserRequest>, UpdateUserRequestValid
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<ISenderClient, EmailClient>();
 builder.Services.AddTransient<ITaskExpirationWorker, TaskExpirationWorker>();
-builder.Services.AddCronJob<TaskExpirationNotificationService>(c =>
+
+builder.Services.AddQuartz(q =>
 {
-    c.TimeZoneInfo = TimeZoneInfo.Local;
-    c.CronExpression = builder.Configuration["Crone:SendEmailPeriod"];
+    q.UseMicrosoftDependencyInjectionJobFactory();
+    q.AddJobAndTrigger<TaskExpirationNotificationJob>(builder.Configuration);
 });
+builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+
+
 
 builder.Services.AddLogging(loggingBuilder =>
 {

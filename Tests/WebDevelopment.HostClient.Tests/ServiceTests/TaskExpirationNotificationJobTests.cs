@@ -4,21 +4,21 @@ using WebDevelopment.HostClient.Tests.ServiceMocks;
 
 namespace WebDevelopment.HostClient.Tests.ServiceTests
 {
-    public class TaskExpirationNotificationServiceTests
+    public class TaskExpirationNotificationJobTests
     {
         private readonly ITaskExpirationWorkerMock _taskExpirationWorkerMock;
-        private readonly ISenderClientMock _senderClientMock;
-        private readonly Mock<ILogger<TaskExpirationNotificationService>> _loggerMock = new();
-        private readonly Mock<ScheduleConfig<TaskExpirationNotificationService>> _scheduleConfig = new();
-        private readonly TaskExpirationNotificationService _sut;
+        private readonly SenderClientMock _senderClientMock;
+        private readonly JobExecutionContextMock _contextMock;
+        private readonly Mock<ILogger<TaskExpirationNotificationJob>> _loggerMock = new();
+        private readonly TaskExpirationNotificationJob _sut;
 
-        public TaskExpirationNotificationServiceTests()
+        public TaskExpirationNotificationJobTests()
         {
             _taskExpirationWorkerMock = new ITaskExpirationWorkerMock();
-            _senderClientMock = new ISenderClientMock();
-            var f = _scheduleConfig.Object.CronExpression = "* * * * *";
-            _sut = new(_scheduleConfig.Object, _senderClientMock.Object,
-                _taskExpirationWorkerMock.Object, _loggerMock.Object);
+            _senderClientMock = new SenderClientMock();
+            _contextMock = new JobExecutionContextMock();
+            _sut = new TaskExpirationNotificationJob(_loggerMock.Object, _senderClientMock.Object,
+                _taskExpirationWorkerMock.Object);
         }
 
         [Fact]
@@ -28,7 +28,7 @@ namespace WebDevelopment.HostClient.Tests.ServiceTests
             //Act
             var act = new Action(() =>
             {
-                new TaskExpirationNotificationService(null, null, null, null);
+                new TaskExpirationNotificationJob(null, null, null);
             });
 
             var exception = Record.Exception(act);
@@ -38,16 +38,16 @@ namespace WebDevelopment.HostClient.Tests.ServiceTests
         }
 
         [Fact]
-        public void Test_DoWork_NoExceptionThrown()
+        public void Test_Execute_NoExceptionThrown()
         {
             //Arrange
             _taskExpirationWorkerMock.Setup_GetReceiversToSendMethod_ReturnsListWithRecord();
             _senderClientMock.Setup_SendNotificationMethod_WithExistingList();
-            //Act
+            _contextMock.Setup();
             
             var act = new Action(() =>
             {
-                _sut.DoWork(new CancellationToken());
+                _sut.Execute(_contextMock.Object);
             });
             var exception = Record.Exception(act);
 

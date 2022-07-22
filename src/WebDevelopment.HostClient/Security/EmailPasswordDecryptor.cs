@@ -2,7 +2,7 @@
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 
-namespace WebDevelopment.HostClient
+namespace WebDevelopment.HostClient.Security
 {
     public static class EmailPasswordDecryptor
     {

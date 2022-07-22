@@ -8,7 +8,7 @@ namespace WebDevelopment.HostClient.Tests
 {
     public class EmailClientTests
     {
-        private EmailClient? _sut;
+        private readonly EmailClient? _sut;
         private readonly Mock<ILogger<EmailClient>> _loggerMock = new Mock<ILogger<EmailClient>>();
         private readonly Mock<IOptions<SmtpClientSetups>> _configurationsMock = new Mock<IOptions<SmtpClientSetups>>();
 
