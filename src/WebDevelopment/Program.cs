@@ -69,6 +69,7 @@ builder.Services.AddScoped<IValidator<UpdateUserRequest>, UpdateUserRequestValid
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<ISenderClient, EmailClient>();
 builder.Services.AddTransient<ITaskExpirationWorker, TaskExpirationWorker>();
+builder.Services.AddTransient<SmtpClientSetupsFactory>();
 
 builder.Services.AddQuartz(q =>
 {
@@ -86,7 +87,7 @@ builder.Services.AddLogging(loggingBuilder =>
     loggingBuilder.AddLog4Net("log4net.config");
 });
 
-builder.Services.Configure<SmtpClientSetups>(builder.Configuration.GetSection(nameof(SmtpClientSetups)));
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection(nameof(EmailSettings)));
 
 var app = builder.Build();
 

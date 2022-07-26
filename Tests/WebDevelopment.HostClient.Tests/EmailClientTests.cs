@@ -42,6 +42,7 @@ namespace WebDevelopment.HostClient.Tests
         public void Test_SendNotification_ThrowArgumentException_WhenConfigurationsAreIncorrect(string s)
         {
             //Arrange
+            //TODO разбить проверки на 3  теста для каждого параметра
             var smtpClientSetups = new SmtpClientSetups() { EmailSendFrom = s, EmailPassword = s, EncryptionKey = s};
             _configurationsMock.Setup(p => p.Value).Returns(smtpClientSetups);
 

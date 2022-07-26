@@ -6,6 +6,7 @@ namespace WebDevelopment.HostClient.Security
 {
     public static class EmailPasswordDecryptor
     {
+        public const string EncryptKey = "SuperSecretSecurityKey";
         public static string DecryptCipherTextToPlainText(string cipherText, string securityKey)
         {
             var toEncryptArray = Convert.FromBase64String(cipherText);

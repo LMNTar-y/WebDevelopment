@@ -11,17 +11,20 @@ namespace WebDevelopment.HostClient.Implementation;
 
 public class EmailClient : ISenderClient
 {
-    private readonly SmtpClientSetups _configurations;
+    private readonly EmailSettings _configurations;
+    private readonly SmtpClientSetupsFactory _setupsFactory;
+
     private readonly ILogger<EmailClient> _logger;
     private SmtpClient? _smtpClient;
     const string EmailPattern = @"^(?("")(""[^""]+?""@)|(([0-9a-z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)(?<=[0-9a-z])@))" +
                                @"(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-z][-\w]*[0-9a-z]*\.)+[a-z0-9]{2,17}))$";
 
-    public EmailClient(IOptions<SmtpClientSetups> configurations, ILogger<EmailClient> logger)
+    public EmailClient(IOptions<EmailSettings> configurations, SmtpClientSetupsFactory setupsFactory, ILogger<EmailClient> logger)
     {
         _logger = logger;
         if (configurations == null) throw new ArgumentNullException(nameof(configurations), $"{configurations} was not loaded from DI");
         _configurations = configurations.Value;
+        _setupsFactory = setupsFactory;
     }
 
     public void SendNotification(List<string> emailsToSend)
@@ -33,20 +36,9 @@ public class EmailClient : ISenderClient
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(_configurations?.EmailSendFrom) ||
-                string.IsNullOrWhiteSpace(_configurations.EmailPassword) || string.IsNullOrWhiteSpace(_configurations.EncryptionKey) || _configurations.SmtpPort < 0)
+            using (_smtpClient = _setupsFactory.Create(_configurations.CurrentProvider))
             {
-                throw new ArgumentException("Incorrect data in the SmtpClientSetups configurations");
-            }
-
-            using (_smtpClient = new SmtpClient(_configurations.SmtpHost, _configurations.SmtpPort))
-            {
-                _smtpClient.Credentials = new NetworkCredential(_configurations.EmailLogin,
-                    EmailPasswordDecryptor.DecryptCipherTextToPlainText(_configurations.EmailPassword,
-                        _configurations.EncryptionKey));
-                _smtpClient.EnableSsl = true;
-
-                var from = new MailAddress(_configurations.EmailSendFrom, "WebDevelopment");
+                var from = new MailAddress(_setupsFactory.EmailSendFrom, "WebDevelopment");
 
                 foreach (var email in emailsToSend)
                 {
