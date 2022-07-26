@@ -10,7 +10,8 @@ public class UserService : IUserService
 
     public UserService(IConfiguration configuration)
     {
-        _connectionString = configuration["ConnectionStrings:DefaultConnection"];
+        _connectionString = configuration["ConnectionStrings:DefaultConnection"] ??
+                            throw new ArgumentNullException($"{GetType().Name} {nameof(configuration)} - is null");
     }
 
     public IEnumerable<NewUserRequest> GetAllUsers()
@@ -59,7 +60,7 @@ public class UserService : IUserService
         {
             var sqlExpression = "INSERT INTO Users (FirstName, SecondName, UserEmail) VALUES (@Name, @Surname, @Email)";
             await connection.ExecuteAsync(sqlExpression,
-                new { userRequest.FirstName, userRequest.SecondName, userRequest.UserEmail });
+                new { Name = userRequest.FirstName, Surname = userRequest.SecondName, Email = userRequest.UserEmail });
         }
     }
 
@@ -68,9 +69,14 @@ public class UserService : IUserService
         await using (var connection =
                      new SqlConnection(_connectionString))
         {
-            var sqlExpression = "UPDATE Users SET FirstName = @Name, SecondName = @Surname, UserEmail = @Email WHERE Id = @Id";
+            var sqlExpression =
+                "UPDATE Users SET FirstName = @Name, SecondName = @Surname, UserEmail = @Email WHERE Id = @Id";
             await connection.ExecuteAsync(sqlExpression,
-                new { userRequest.Id, userRequest.FirstName, userRequest.SecondName, userRequest.UserEmail });
+                new
+                {
+                    userRequest.Id, Name = userRequest.FirstName, Surname = userRequest.SecondName,
+                    Email = userRequest.UserEmail
+                });
         }
     }
 }

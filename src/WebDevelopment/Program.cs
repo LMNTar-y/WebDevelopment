@@ -2,12 +2,18 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using Quartz;
 using WebDevelopment.API.Middleware;
 using WebDevelopment.API.Model;
 using WebDevelopment.API.Model.Validators;
 using WebDevelopment.API.Security;
 using WebDevelopment.API.Services;
+using WebDevelopment.HostClient;
+using WebDevelopment.HostClient.Implementation;
+using WebDevelopment.HostClient.Interfaces;
+using WebDevelopment.HostClient.Model;
 using WebDevelopment.Infrastructure;
+using WebDevelopment.API.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,8 +23,10 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.AddDbContext<WebDevelopmentContext>(options =>
-    options.UseSqlServer(builder.Configuration["ConnectionStrings:DefaultConnection"]));
+builder.Services.AddDbContext<WebDevelopmentContext>(
+    options =>
+    options.UseSqlServer(builder.Configuration["ConnectionStrings:DefaultConnection"])
+    );
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -59,7 +67,27 @@ builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddScoped<IValidator<NewUserRequest>, BaseUserValidator>();
 builder.Services.AddScoped<IValidator<UpdateUserRequest>, UpdateUserRequestValidator>();
 builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddTransient<ISenderClient, EmailClient>();
+builder.Services.AddTransient<ITaskExpirationWorker, TaskExpirationWorker>();
+builder.Services.AddTransient<SmtpClientSetupsFactory>();
 
+builder.Services.AddQuartz(q =>
+{
+    q.UseMicrosoftDependencyInjectionJobFactory();
+    q.AddJobAndTrigger<TaskExpirationNotificationJob>(builder.Configuration);
+});
+builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+
+
+
+builder.Services.AddLogging(loggingBuilder =>
+{
+    loggingBuilder.ClearProviders();
+    loggingBuilder.SetMinimumLevel(LogLevel.Trace);
+    loggingBuilder.AddLog4Net("log4net.config");
+});
+
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection(nameof(EmailSettings)));
 
 var app = builder.Build();
 
