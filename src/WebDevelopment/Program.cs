@@ -11,9 +11,10 @@ using WebDevelopment.API.Services;
 using WebDevelopment.HostClient;
 using WebDevelopment.HostClient.Implementation;
 using WebDevelopment.HostClient.Interfaces;
-using WebDevelopment.HostClient.Model;
 using WebDevelopment.Infrastructure;
 using WebDevelopment.API.Extensions;
+using WebDevelopment.Email.Model;
+using WebDevelopment.Email.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -67,9 +68,8 @@ builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddScoped<IValidator<NewUserRequest>, BaseUserValidator>();
 builder.Services.AddScoped<IValidator<UpdateUserRequest>, UpdateUserRequestValidator>();
 builder.Services.AddTransient<IUserService, UserService>();
-builder.Services.AddTransient<ISenderClient, EmailClient>();
 builder.Services.AddTransient<ITaskExpirationWorker, TaskExpirationWorker>();
-builder.Services.AddTransient<SmtpClientSetupsFactory>();
+builder.Services.AddTransient<EmailProviderSetupFactory>();
 
 builder.Services.AddQuartz(q =>
 {
@@ -88,7 +88,6 @@ builder.Services.AddLogging(loggingBuilder =>
 });
 
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection(nameof(EmailSettings)));
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

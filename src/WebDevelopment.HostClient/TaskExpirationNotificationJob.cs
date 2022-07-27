@@ -1,6 +1,10 @@
 ﻿
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Quartz;
+using WebDevelopment.Email.Model;
+using WebDevelopment.Email.Settings;
 using WebDevelopment.HostClient.Interfaces;
 
 namespace WebDevelopment.HostClient
@@ -9,14 +13,16 @@ namespace WebDevelopment.HostClient
     {
 
         private readonly ILogger<TaskExpirationNotificationJob> _logger;
-        private readonly ISenderClient _emailClient;
         private readonly ITaskExpirationWorker _worker;
+        private readonly EmailProviderSetupFactory _emailProviderFactory;
+        private readonly EmailProviderName _emailProviderName;
 
-        public TaskExpirationNotificationJob(ILogger<TaskExpirationNotificationJob> logger, ISenderClient emailClient, ITaskExpirationWorker worker)
+        public TaskExpirationNotificationJob(IServiceProvider serviceProvider)
         {
-            _emailClient = emailClient ?? throw new ArgumentNullException(nameof(emailClient), "Impossible to get ISenderClient through DI");
-            _worker = worker ?? throw new ArgumentNullException(nameof(worker), "Impossible to get ITaskExpirationWorker through DI");
-            _logger = logger;
+            _worker = serviceProvider.GetRequiredService<ITaskExpirationWorker>();
+            _logger = serviceProvider.GetRequiredService<ILogger<TaskExpirationNotificationJob>>();
+            _emailProviderFactory = serviceProvider.GetRequiredService<EmailProviderSetupFactory>();
+            _emailProviderName = Enum.Parse<EmailProviderName>(serviceProvider.GetRequiredService<IConfiguration>()[$"{nameof(EmailSettings)}:CurrentProvider"]);
         }
 
         public Task Execute(IJobExecutionContext context)
@@ -24,10 +30,11 @@ namespace WebDevelopment.HostClient
             _logger.LogInformation("TaskExpirationNotificationJob - started");
             try
             {
+                var emailProvider = _emailProviderFactory.Create(_emailProviderName);
                 var emails = _worker.GetReceiversToSend();
                 if (emails?.Count > 0)
                 {
-                    _emailClient.SendNotification(emails);
+                    emailProvider.SendNotification(emails);
                 }
                 else
                 {

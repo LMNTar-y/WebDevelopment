@@ -7,7 +7,6 @@ namespace WebDevelopment.HostClient.Tests.ServiceTests
     public class TaskExpirationNotificationJobTests
     {
         private readonly ITaskExpirationWorkerMock _taskExpirationWorkerMock;
-        private readonly SenderClientMock _senderClientMock;
         private readonly JobExecutionContextMock _contextMock;
         private readonly Mock<ILogger<TaskExpirationNotificationJob>> _loggerMock = new();
         private readonly TaskExpirationNotificationJob _sut;
@@ -15,10 +14,8 @@ namespace WebDevelopment.HostClient.Tests.ServiceTests
         public TaskExpirationNotificationJobTests()
         {
             _taskExpirationWorkerMock = new ITaskExpirationWorkerMock();
-            _senderClientMock = new SenderClientMock();
             _contextMock = new JobExecutionContextMock();
-            _sut = new TaskExpirationNotificationJob(_loggerMock.Object, _senderClientMock.Object,
-                _taskExpirationWorkerMock.Object);
+            _sut = new TaskExpirationNotificationJob(null); //TODO
         }
 
         [Fact]
@@ -28,7 +25,7 @@ namespace WebDevelopment.HostClient.Tests.ServiceTests
             //Act
             var act = new Action(() =>
             {
-                new TaskExpirationNotificationJob(null, null, null);
+                new TaskExpirationNotificationJob(null);
             });
 
             var exception = Record.Exception(act);
@@ -42,7 +39,6 @@ namespace WebDevelopment.HostClient.Tests.ServiceTests
         {
             //Arrange
             _taskExpirationWorkerMock.Setup_GetReceiversToSendMethod_ReturnsListWithRecord();
-            _senderClientMock.Setup_SendNotificationMethod_WithExistingList();
             _contextMock.Setup();
             
             var act = new Action(() =>

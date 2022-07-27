@@ -1,4 +1,4 @@
-﻿namespace WebDevelopment.HostClient.Model;
+﻿namespace WebDevelopment.Email.Model;
 
 public class EmailProviderSettings
 {

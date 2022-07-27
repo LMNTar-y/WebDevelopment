@@ -25,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\WebDevelopment.Email\WebDevelopment.Email.csproj" />
     <ProjectReference Include="..\WebDevelopment.HostClient\WebDevelopment.HostClient.csproj" />
     <ProjectReference Include="..\WebDevelopment.Infrastructure\WebDevelopment.Infrastructure.csproj" />
   </ItemGroup>

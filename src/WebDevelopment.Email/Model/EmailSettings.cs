@@ -1,4 +1,4 @@
-﻿namespace WebDevelopment.HostClient.Model;
+﻿namespace WebDevelopment.Email.Model;
 
 public class EmailSettings
 {
@@ -6,5 +6,5 @@ public class EmailSettings
 
     public string? EmailBody { get; set; }
 
-    public EmailProvider? CurrentProvider { get; set; }
+    public EmailProviderName? CurrentProvider { get; set; }
 }
