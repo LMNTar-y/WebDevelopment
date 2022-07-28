@@ -1,9 +1,11 @@
 ﻿using System.Net;
 using System.Net.Mail;
+using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using WebDevelopment.Email.Model;
+using WebDevelopment.Email.Model.Validators;
 using WebDevelopment.Email.Security;
 
 namespace WebDevelopment.Email.Settings;
@@ -28,11 +30,16 @@ public abstract class EmailSmtpClientHelper : IDisposable
 
     public async Task<bool> SendEmailAsync(MailMessage message) //message
     {
+        _logger.LogInformation("EmailSmtpClientHelper - SendEmailAsync - method started");
         var retValue = false;
 
         try
         {
-            //using
+            _logger.LogInformation("Validation of email provider settings started");
+            var providerSettingsValidator = new EmailProviderSettingsValidator();
+            await providerSettingsValidator.ValidateAndThrowAsync(_emailProviderSettings);
+            _logger.LogInformation("Validation of email provider settings finished");
+
             using (_smtpClient = new SmtpClient(_emailProviderSettings.SmtpHost, _emailProviderSettings.SmtpPort))
             {
                 _smtpClient.Credentials = new NetworkCredential(_emailProviderSettings.EmailLogin,
@@ -58,4 +65,5 @@ public abstract class EmailSmtpClientHelper : IDisposable
     {
         _smtpClient?.Dispose();
     }
+
 }

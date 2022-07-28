@@ -8,7 +8,7 @@ public class EmailProviderSettings
 
     public string? EmailLogin { get; set; }
 
-    public string? EmailSendFrom { get; set; }
+    public string EmailSendFrom { get; set; } = null!;
 
-    public string? EmailPassword { get; set; }
+    public string EmailPassword { get; set; } = null!;
 }

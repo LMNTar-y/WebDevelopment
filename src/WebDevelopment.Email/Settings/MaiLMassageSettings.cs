@@ -1,22 +1,26 @@
 ﻿using System.Net.Mail;
+using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using WebDevelopment.Email.Model;
+using WebDevelopment.Email.Model.Validators;
 
 namespace WebDevelopment.Email.Settings;
 
-public class MaiLMassageSettings
+public class MailMassageSettings
 {
     private readonly IServiceProvider _serviceProvider;
-    public MaiLMassageSettings(IServiceProvider serviceProvider)
+    public MailMassageSettings(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
     }
 
-    public MailMessage CreateMessage(MailAddress from, string to)
+    public async Task<MailMessage> CreateMessageAsync(MailAddress from, string to)
     {
         var emailSettings = _serviceProvider.GetRequiredService<IConfiguration>().GetSection(nameof(EmailSettings))
             .Get<EmailSettings>();
+        var emailSettingsValidator = new EmailSettingsValidator();
+        await emailSettingsValidator.ValidateAndThrowAsync(emailSettings);
 
         var message = new MailMessage();
         message.From = from;

@@ -10,7 +10,6 @@ public class TaskExpirationWorker : ITaskExpirationWorker
 
     public TaskExpirationWorker(IServiceScopeFactory scopeFactory)
     {
-
         _scopeFactory = scopeFactory;
     }
 
@@ -23,7 +22,7 @@ public class TaskExpirationWorker : ITaskExpirationWorker
 
             var samples = context.Users.Join(context.UserTasks, u => u.Id, t => t.UserId, (u, t) => new { u, t })
                 .Where(@t1 => @t1.t.FinishDate == null)
-                .Select(@t1 => new { @t1.u.UserEmail, @t1.t.StartDate, @t1.t.ValidTill })
+                .Select(@t1 => new { @t1.u.UserEmail, @t1.t.ValidTill })
                 .ToList();
 
             if (samples.Count > 0)
