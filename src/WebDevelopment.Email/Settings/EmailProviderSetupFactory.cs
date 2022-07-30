@@ -20,7 +20,7 @@ namespace WebDevelopment.Email.Settings
             _serviceProvider = serviceProvider;
         }
 
-        public IEmailProvider Create(EmailProviderName emailProviderName)
+        public virtual IEmailProvider Create(EmailProviderName emailProviderName)
         {
             switch (emailProviderName)
             {

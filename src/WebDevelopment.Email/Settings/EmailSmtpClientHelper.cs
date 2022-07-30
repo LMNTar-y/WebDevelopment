@@ -14,6 +14,7 @@ public abstract class EmailSmtpClientHelper : IDisposable
 {
     protected MailAddress From;
     private SmtpClient _smtpClient = null!;
+    public SmtpClientSendMailAsyncWrapper SmtpClientSendMailAsyncWrapper { get; set; }
     private readonly ILogger<EmailSmtpClientHelper> _logger;
     private readonly EmailProviderSettings _emailProviderSettings;
 
@@ -26,6 +27,7 @@ public abstract class EmailSmtpClientHelper : IDisposable
             .Get<EmailProviderSettings>() ?? throw new ArgumentNullException(nameof(serviceProvider),
             $"Error with receiving settings for {_emailProviderSettings} from the appsettings file");
         From = new MailAddress(_emailProviderSettings.EmailSendFrom, "WebDevelopment");
+        SmtpClientSendMailAsyncWrapper = new SmtpClientSendMailAsyncWrapper();
     }
 
     public async Task<bool> SendEmailAsync(MailMessage message) //message
@@ -47,7 +49,8 @@ public abstract class EmailSmtpClientHelper : IDisposable
                         EmailPasswordDecryptor.EncryptKey));
                 _smtpClient.EnableSsl = true;
 
-                await _smtpClient.SendMailAsync(message);
+                //await _smtpClient.SendMailAsync(message);
+                await SmtpClientSendMailAsyncWrapper.SendAsync(_smtpClient, message);
             }
 
             retValue = true;

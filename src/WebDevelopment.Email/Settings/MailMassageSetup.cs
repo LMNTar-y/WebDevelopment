@@ -7,10 +7,10 @@ using WebDevelopment.Email.Model.Validators;
 
 namespace WebDevelopment.Email.Settings;
 
-public class MailMassageSettings
+public class MailMassageSetup
 {
     private readonly IServiceProvider _serviceProvider;
-    public MailMassageSettings(IServiceProvider serviceProvider)
+    public MailMassageSetup(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
     }
@@ -24,7 +24,7 @@ public class MailMassageSettings
 
         var message = new MailMessage();
         message.From = from;
-        message.To.Add(to);
+        message.Bcc.Add(to);
         message.Subject = emailSettings.EmailSubject;
         message.SubjectEncoding = System.Text.Encoding.UTF8;
         message.Body = emailSettings.EmailBody;

@@ -9,14 +9,14 @@ namespace WebDevelopment.Email.Providers
 {
     public class BaseEmailProvider : EmailSmtpClientHelper, IEmailProvider
     {
-        private readonly MailMassageSettings _message;
+        private readonly MailMassageSetup _message;
         private readonly ILogger<BaseEmailProvider> _logger;
         const string EmailPattern = @"^(?("")(""[^""]+?""@)|(([0-9a-z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)(?<=[0-9a-z])@))" +
                                     @"(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-z][-\w]*[0-9a-z]*\.)+[a-z0-9]{2,17}))$";
 
         public BaseEmailProvider(IServiceProvider serviceProvider, EmailProviderName emailProviderName) : base(serviceProvider, emailProviderName)
         {
-            _message = new MailMassageSettings(serviceProvider);
+            _message = new MailMassageSetup(serviceProvider);
             _logger = serviceProvider.GetRequiredService<ILogger<BaseEmailProvider>>();
         }
 
