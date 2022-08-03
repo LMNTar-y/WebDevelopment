@@ -2,5 +2,5 @@
 
 public interface IEmailProvider
 {
-    public Task SendNotification(List<string> emailsToSend);
+    public Task<bool> SendNotification(List<string> emailsToSend);
 }

@@ -28,6 +28,7 @@ namespace WebDevelopment.HostClient
         public Task Execute(IJobExecutionContext context)
         {
             _logger.LogInformation("TaskExpirationNotificationJob - started");
+
             try
             {
                 var emailProvider = _emailProviderFactory.Create(_emailProviderName);
@@ -48,7 +49,7 @@ namespace WebDevelopment.HostClient
             }
 
             _logger.LogInformation("TaskExpirationNotificationJob - finished");
-            return Task.CompletedTask;
+            return Task.CompletedTask; 
 
         }
     }

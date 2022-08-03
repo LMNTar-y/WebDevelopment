@@ -20,12 +20,13 @@ namespace WebDevelopment.Email.Providers
             _logger = serviceProvider.GetRequiredService<ILogger<BaseEmailProvider>>();
         }
 
-        public async Task SendNotification(List<string> emailsToSend)
+        public async Task<bool> SendNotification(List<string> emailsToSend)
         {
+            var retVal = false;
             if (emailsToSend == null || emailsToSend.Count < 1)
             {
                 _logger.LogInformation("The List of the emails to sent is null or empty");
-                return;
+                return retVal;
             }
 
             try
@@ -37,6 +38,11 @@ namespace WebDevelopment.Email.Providers
                         _logger.LogWarning("Incorrect email in dataBase - {0}", email);
                         emailsToSend.Remove(email);
                     }
+
+                    if (emailsToSend.Count < 1)
+                    {
+                        throw new ArgumentNullException(nameof(emailsToSend), $"There is no correct emails in the {emailsToSend}");
+                    }
                 }
 
                 var joined = string.Join(",", emailsToSend);
@@ -44,6 +50,7 @@ namespace WebDevelopment.Email.Providers
                 using var message = await _message.CreateMessageAsync(From, joined);
                 await SendEmailAsync(message);
 
+                retVal = true;
                 message?.Dispose();
             }
             catch (Exception ex)
@@ -51,7 +58,7 @@ namespace WebDevelopment.Email.Providers
                 _logger.LogCritical($"BaseEmailProvider - SendNotification - {ex.Message}");
             }
 
-
+            return retVal;
         }
 
     }

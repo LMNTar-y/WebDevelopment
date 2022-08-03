@@ -10,16 +10,13 @@ namespace WebDevelopment.Email.Tests
     public class BaseEmailProviderTests
     {
         private readonly ServiceProviderMock _serviceProviderMock = new();
-        private readonly Mock<ILogger<EmailSmtpClientHelper>> _smtpClientHelperLoggerMock = new();
-        private readonly Mock<ILogger<BaseEmailProvider>> _emailProviderLoggerMock = new();
         private readonly Mock<SmtpClientSendMailAsyncWrapper> _smtpClientWrapperMock = new();
         private readonly BaseEmailProvider _sut;
 
         public BaseEmailProviderTests()
         {
             _serviceProviderMock.Setup_ValidConfiguration();
-            _serviceProviderMock.Setup(x => x.GetService(typeof(ILogger<EmailSmtpClientHelper>))).Returns(_smtpClientHelperLoggerMock.Object);
-            _serviceProviderMock.Setup(x => x.GetService(typeof(ILogger<BaseEmailProvider>))).Returns(_emailProviderLoggerMock.Object);
+            _smtpClientWrapperMock.Setup(x => x.SendAsync(It.IsAny<SmtpClient>(), It.IsAny<MailMessage>()));
             _sut = new BaseEmailProvider(_serviceProviderMock.Object, EmailProviderName.Yandex);
         }
 
@@ -40,21 +37,46 @@ namespace WebDevelopment.Email.Tests
         }
 
         [Fact]
-        public void Test_SendNotification_NoExceptionThrown()
+        public async Task Test_SendNotification_WhenEmailsListIsEmpty_ReturnFalse()
         {
             //Arrange
             //Act
-            var act = new Action(async () =>
-            {
-                await _sut.SendNotification(new List<string>(){"test@test.test"});
-            });
-            var exception = Record.Exception(act);
 
+            var result = await _sut.SendNotification(new List<string>());
+            
             //Assert
-            Assert.Null(exception);
+            Assert.False(result);
         }
 
+        [Fact]
+        public async Task Test_SendNotification_WhenEmailsInTheListAreIncorrect_ReturnFalse()
+        {
+            //Arrange
+            //Act
+
+            var result = await _sut.SendNotification(new List<string>(){"test"});
+
+            //Assert
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async Task Test_SendNotification_WhenEmailsInTheListAreCorrect_ReturnTrue()
+        {
+            //Arrange
+            _sut.SmtpClientSendMailAsyncWrapper = _smtpClientWrapperMock.Object;
+
+            //Act
+            var result = await _sut.SendNotification(new List<string>() { "test@test.test" });
+
+            //Assert
+            Assert.True(result);
+        }
+
+
         #region SendEmailAsync
+
+
         [Fact]
         public async Task Test_SendEmailAsync_WhenMailMessageIsNull_ReturnFalse()
         {
@@ -82,8 +104,8 @@ namespace WebDevelopment.Email.Tests
         {
             //Arrange
             var mailMessage = await new MailMassageSetup(_serviceProviderMock.Object).CreateMessageAsync(new MailAddress("xx@xx.xx"), "test@test.test");
-            _smtpClientWrapperMock.Setup(x => x.SendAsync(It.IsAny<SmtpClient>(), It.IsAny<MailMessage>()));
             _sut.SmtpClientSendMailAsyncWrapper = _smtpClientWrapperMock.Object;
+
             //Act
             var result = await _sut.SendEmailAsync(mailMessage);
 
@@ -92,7 +114,5 @@ namespace WebDevelopment.Email.Tests
         }
 
         #endregion
-
-
     }
 }
