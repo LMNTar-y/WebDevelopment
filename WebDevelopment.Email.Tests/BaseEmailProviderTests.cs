@@ -18,6 +18,7 @@ namespace WebDevelopment.Email.Tests
             _serviceProviderMock.Setup_ValidConfiguration();
             _smtpClientWrapperMock.Setup(x => x.SendAsync(It.IsAny<SmtpClient>(), It.IsAny<MailMessage>()));
             _sut = new BaseEmailProvider(_serviceProviderMock.Object, EmailProviderName.Yandex);
+            _sut.SmtpClientSendMailAsyncWrapper = _smtpClientWrapperMock.Object;
         }
 
         [Fact]
@@ -64,8 +65,6 @@ namespace WebDevelopment.Email.Tests
         public async Task Test_SendNotification_WhenEmailsInTheListAreCorrect_ReturnTrue()
         {
             //Arrange
-            _sut.SmtpClientSendMailAsyncWrapper = _smtpClientWrapperMock.Object;
-
             //Act
             var result = await _sut.SendNotification(new List<string>() { "test@test.test" });
 
@@ -104,8 +103,7 @@ namespace WebDevelopment.Email.Tests
         {
             //Arrange
             var mailMessage = await new MailMassageSetup(_serviceProviderMock.Object).CreateMessageAsync(new MailAddress("xx@xx.xx"), "test@test.test");
-            _sut.SmtpClientSendMailAsyncWrapper = _smtpClientWrapperMock.Object;
-
+            
             //Act
             var result = await _sut.SendEmailAsync(mailMessage);
 

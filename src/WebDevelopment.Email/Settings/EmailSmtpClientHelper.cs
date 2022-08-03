@@ -35,6 +35,12 @@ public abstract class EmailSmtpClientHelper : IDisposable
         _logger.LogInformation("EmailSmtpClientHelper - SendEmailAsync - method started");
         var retValue = false;
 
+        if (message?.From == null || message?.Bcc == null)
+        {
+            _logger.LogCritical($"EmailSmtpClientHelper - SendEmailAsync - {message} is not created or empty");
+            return retValue;
+        }
+
         try
         {
             _logger.LogInformation("Validation of email provider settings started");

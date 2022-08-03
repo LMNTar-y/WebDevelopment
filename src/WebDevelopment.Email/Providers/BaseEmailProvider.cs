@@ -23,29 +23,36 @@ namespace WebDevelopment.Email.Providers
         public async Task<bool> SendNotification(List<string> emailsToSend)
         {
             var retVal = false;
+
             if (emailsToSend == null || emailsToSend.Count < 1)
             {
                 _logger.LogInformation("The List of the emails to sent is null or empty");
                 return retVal;
             }
+            
+            var checkedEmailsToSend = new List<string>();
 
             try
             {
                 foreach (var email in emailsToSend)
                 {
-                    if (!Regex.IsMatch(email, EmailPattern, RegexOptions.IgnoreCase))
+                    if (Regex.IsMatch(email, EmailPattern, RegexOptions.IgnoreCase))
                     {
-                        _logger.LogWarning("Incorrect email in dataBase - {0}", email);
-                        emailsToSend.Remove(email);
+                        checkedEmailsToSend.Add(email);
                     }
-
-                    if (emailsToSend.Count < 1)
+                    else
                     {
-                        throw new ArgumentNullException(nameof(emailsToSend), $"There is no correct emails in the {emailsToSend}");
+                        _logger.LogWarning("Incorrect email in the dataBase - {0}", email);
                     }
                 }
 
-                var joined = string.Join(",", emailsToSend);
+                if (checkedEmailsToSend.Count < 1)
+                {
+                    _logger.LogInformation("The List of the checked emails to sent is null or empty");
+                    return retVal;
+                }
+
+                var joined = string.Join(",", checkedEmailsToSend);
 
                 using var message = await _message.CreateMessageAsync(From, joined);
                 await SendEmailAsync(message);
