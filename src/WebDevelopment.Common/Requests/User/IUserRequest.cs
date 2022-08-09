@@ -1,4 +1,4 @@
-﻿namespace WebDevelopment.API.Model;
+﻿namespace WebDevelopment.Common.Requests.User;
 
 public interface IUserRequest
 {

@@ -8,8 +8,8 @@
 
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.0.123" />
-    <PackageReference Include="FluentValidation" Version="11.1.0" />
-    <PackageReference Include="FluentValidation.AspNetCore" Version="11.1.2" />
+    <PackageReference Include="FluentValidation" Version="11.2.0" />
+    <PackageReference Include="FluentValidation.AspNetCore" Version="11.2.1" />
     <PackageReference Include="IKVM" Version="8.2.0" />
     <PackageReference Include="log4net" Version="2.0.14" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.7">
@@ -25,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\WebDevelopment.Domain\WebDevelopment.Domain.csproj" />
     <ProjectReference Include="..\WebDevelopment.Email\WebDevelopment.Email.csproj" />
     <ProjectReference Include="..\WebDevelopment.HostClient\WebDevelopment.HostClient.csproj" />
     <ProjectReference Include="..\WebDevelopment.Infrastructure\WebDevelopment.Infrastructure.csproj" />

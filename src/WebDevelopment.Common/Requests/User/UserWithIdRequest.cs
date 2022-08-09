@@ -1,7 +1,7 @@
 ﻿
-namespace WebDevelopment.API.Model;
+namespace WebDevelopment.Common.Requests.User;
 
-public class UpdateUserRequest : IUserRequest
+public class UserWithIdRequest : IUserRequest
 {
     public int Id { get; set; }
 
@@ -10,4 +10,6 @@ public class UpdateUserRequest : IUserRequest
     public string? SecondName { get; set; }
 
     public string? UserEmail { get; set; }
+
+    public bool? Active { get; set; }
 }

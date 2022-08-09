@@ -4,17 +4,20 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Quartz;
 using WebDevelopment.API.Middleware;
-using WebDevelopment.API.Model;
-using WebDevelopment.API.Model.Validators;
 using WebDevelopment.API.Security;
-using WebDevelopment.API.Services;
+using WebDevelopment.API.Extensions;
+using WebDevelopment.Common.Requests.User;
+using WebDevelopment.Common.Requests.User.Validators;
+using WebDevelopment.Domain.User.Services;
+using WebDevelopment.Domain.User;
 using WebDevelopment.HostClient;
 using WebDevelopment.HostClient.Implementation;
 using WebDevelopment.HostClient.Interfaces;
-using WebDevelopment.Infrastructure;
-using WebDevelopment.API.Extensions;
 using WebDevelopment.Email.Model;
 using WebDevelopment.Email.Settings;
+using WebDevelopment.Infrastructure;
+using WebDevelopment.Infrastructure.Repositories;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -66,10 +69,11 @@ builder.Services.AddAuthentication(ApiKeyAuthOptions.DefaultScheme)
 
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddScoped<IValidator<NewUserRequest>, BaseUserValidator>();
-builder.Services.AddScoped<IValidator<UpdateUserRequest>, UpdateUserRequestValidator>();
+builder.Services.AddScoped<IValidator<UserWithIdRequest>, UpdateUserRequestValidator>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<ITaskExpirationWorker, TaskExpirationWorker>();
 builder.Services.AddTransient<EmailProviderSetupFactory>();
+builder.Services.AddTransient<IUserRepository, UserRepository>();
 
 builder.Services.AddQuartz(q =>
 {

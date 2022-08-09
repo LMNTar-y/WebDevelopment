@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WebDevelopment.API.Model;
-using WebDevelopment.API.Services;
+using WebDevelopment.Common.Requests.User;
+using WebDevelopment.Domain;
+using WebDevelopment.Domain.User.Services;
 
 namespace WebDevelopment.API.Controllers;
 
@@ -18,36 +19,117 @@ public class UserController : ControllerBase
     }
 
     [HttpGet]
-    public IEnumerable<NewUserRequest> GetAllUsers()
+    public async Task<IActionResult> GetAllUsers()
     {
-        return _userService.GetAllUsers();
+        try
+        {
+            var result = await _userService.GetAllUsers();
+            return Ok(new ResponseWrapper<IEnumerable<UserWithIdRequest>>()
+            {
+                Result = result
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status400BadRequest, new ResponseWrapper<object>
+            {
+                Errors = new List<Error>()
+                {
+                    new Error{ Message = ex.Message}
+                }
+            });
+        }
     }
 
     [HttpGet("{id:int}")]
-    public NewUserRequest GetUserById(int id)
+    public async Task<IActionResult> GetUserById(int id)
     {
-        return _userService.GetUserById(id);
+        try
+        {
+            var result = await _userService.GetUserById(id);
+            return Ok(new ResponseWrapper<UserWithIdRequest>()
+            {
+                Result = result
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status404NotFound, new ResponseWrapper<object>
+            {
+                Errors = new List<Error>()
+                {
+                    new Error{ Message = ex.Message}
+                }
+            });
+        }
     }
 
     [HttpGet("{userEmail}")]
-    public NewUserRequest GetUserByEmail(string userEmail)
+    public async Task<IActionResult> GetUserByEmail(string userEmail)
     {
-        return _userService.GetUserByEmail(userEmail);
+        try
+        {
+            var result = await _userService.GetUserByEmail(userEmail);
+            return Ok(new ResponseWrapper<UserWithIdRequest>()
+            {
+                Result = result
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status404NotFound, new ResponseWrapper<object>
+            {
+                Errors = new List<Error>()
+                {
+                    new Error{ Message = ex.Message}
+                }
+            });
+        }
     }
 
     [HttpPost]
     public async Task<ActionResult> SaveAsync([FromBody] NewUserRequest userRequest)
     {
-        await _userService.CreateNewUserAsync(userRequest);
-
-        return Ok();
+        try
+        {
+            var result = await _userService.CreateNewUserAsync(userRequest);
+            return Ok(new ResponseWrapper<object>()
+            {
+                Result = result
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new ResponseWrapper<object>
+            {
+                Errors = new List<Error>()
+                {
+                    new Error{ Message = ex.Message}
+                }
+            });
+        }
     }
 
     [HttpPut]
-    public async Task<ActionResult> UpdateAsync([FromBody] UpdateUserRequest userRequest)
+    public async Task<ActionResult> UpdateAsync([FromBody] UserWithIdRequest userWithIdRequest)
     {
-        await _userService.UpdateUserAsync(userRequest);
-
-        return Ok();
+        try
+        {
+            var result = await _userService.UpdateUserAsync(userWithIdRequest);
+            return Ok(new ResponseWrapper<object>()
+            {
+                Result = result
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new ResponseWrapper<object>
+            {
+                Errors = new List<Error>()
+                {
+                    new Error{ Message = ex.Message}
+                }
+            });
+        }
     }
 }

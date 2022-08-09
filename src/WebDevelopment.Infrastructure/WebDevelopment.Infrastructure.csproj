@@ -14,4 +14,13 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Repositories\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WebDevelopment.Common\WebDevelopment.Common.csproj" />
+    <ProjectReference Include="..\WebDevelopment.Domain\WebDevelopment.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

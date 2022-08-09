@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using WebDevelopment.API.Model;
-using WebDevelopment.API.Services;
+using WebDevelopment.Common.Requests.User;
+using WebDevelopment.Domain.User.Services;
 
 namespace WebDevelopment.API.Tests.IntegrationTests;
 
@@ -19,11 +19,11 @@ public class UserControllerTests
 
     public UserControllerTests()
     {
-        _userServiceMock.Setup(us => us.UpdateUserAsync(It.IsAny<UpdateUserRequest>()));
+        _userServiceMock.Setup(us => us.UpdateUserAsync(It.IsAny<UserWithIdRequest>()));
         _userServiceMock.Setup(us => us.CreateNewUserAsync(It.IsAny<NewUserRequest>()));
-        _userServiceMock.Setup(us => us.GetUserById(It.Is<int>(i => i > 0))).Returns(() => new NewUserRequest());
-        _userServiceMock.Setup(us => us.GetUserByEmail(It.IsAny<string>())).Returns(() => new NewUserRequest());
-        _userServiceMock.Setup(us => us.GetAllUsers()).Returns(() => new List<NewUserRequest>());
+        _userServiceMock.Setup(us => us.GetUserById(It.Is<int>(i => i > 0))).ReturnsAsync(() => new UserWithIdRequest());
+        _userServiceMock.Setup(us => us.GetUserByEmail(It.IsAny<string>())).ReturnsAsync(() => new UserWithIdRequest());
+        _userServiceMock.Setup(us => us.GetAllUsers()).ReturnsAsync(() => new List<UserWithIdRequest>());
         _client = _factory.WithWebHostBuilder(
                 builder => builder.ConfigureTestServices(
                     services =>
@@ -87,7 +87,7 @@ public class UserControllerTests
         // Arrange
         //Act
         var response = await _client.PutAsync("",
-            new StringContent(JsonSerializer.Serialize(new UpdateUserRequest()), Encoding.UTF8, "application/json"));
+            new StringContent(JsonSerializer.Serialize(new UserWithIdRequest()), Encoding.UTF8, "application/json"));
 
         //Assert
         Assert.NotNull(response);
@@ -99,7 +99,7 @@ public class UserControllerTests
     public async Task PutRequest_PassValidation_ReturnOK()
     {
         // Arrange
-        var user = new UpdateUserRequest()
+        var user = new UserWithIdRequest()
         { Id = 1, FirstName = "Test", SecondName = "Test", UserEmail = "test@test.test" };
 
         //Act

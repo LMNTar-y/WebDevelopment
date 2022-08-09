@@ -15,14 +15,14 @@ namespace WebDevelopment.HostClient
         private readonly ILogger<TaskExpirationNotificationJob> _logger;
         private readonly ITaskExpirationWorker _worker;
         private readonly EmailProviderSetupFactory _emailProviderFactory;
-        private readonly EmailProviderName _emailProviderName;
+        private readonly IConfiguration _configuration;
 
         public TaskExpirationNotificationJob(IServiceProvider serviceProvider)
         {
             _worker = serviceProvider.GetRequiredService<ITaskExpirationWorker>();
             _logger = serviceProvider.GetRequiredService<ILogger<TaskExpirationNotificationJob>>();
             _emailProviderFactory = serviceProvider.GetRequiredService<EmailProviderSetupFactory>();
-            _emailProviderName = Enum.Parse<EmailProviderName>(serviceProvider.GetRequiredService<IConfiguration>()[$"{nameof(EmailSettings)}:CurrentProvider"]);
+            _configuration = serviceProvider.GetRequiredService<IConfiguration>();
         }
 
         public Task Execute(IJobExecutionContext context)
@@ -31,8 +31,12 @@ namespace WebDevelopment.HostClient
 
             try
             {
-                var emailProvider = _emailProviderFactory.Create(_emailProviderName);
+                var emailProviderName =
+                    Enum.Parse<EmailProviderName>(_configuration[$"{nameof(EmailSettings)}:CurrentProvider"]);
+
+                var emailProvider = _emailProviderFactory.Create(emailProviderName);
                 var emails = _worker.GetReceiversToSend();
+
                 if (emails?.Count > 0)
                 {
                     emailProvider.SendNotification(emails);
@@ -49,8 +53,8 @@ namespace WebDevelopment.HostClient
             }
 
             _logger.LogInformation("TaskExpirationNotificationJob - finished");
-            return Task.CompletedTask; 
 
+            return Task.CompletedTask;
         }
     }
 }

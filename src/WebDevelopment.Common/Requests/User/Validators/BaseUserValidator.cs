@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace WebDevelopment.API.Model.Validators;
+namespace WebDevelopment.Common.Requests.User.Validators;
 
 public class BaseUserValidator : AbstractValidator<IUserRequest>
 {

@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
 
-namespace WebDevelopment.API.Model.Validators;
+namespace WebDevelopment.Common.Requests.User.Validators;
 
-public class UpdateUserRequestValidator : AbstractValidator<UpdateUserRequest>
+public class UpdateUserRequestValidator : AbstractValidator<UserWithIdRequest>
 {
     public UpdateUserRequestValidator()
     {
