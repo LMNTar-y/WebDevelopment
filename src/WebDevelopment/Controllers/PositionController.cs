@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WebDevelopment.Common.Requests.Position;
+using WebDevelopment.Domain;
+using WebDevelopment.Domain.Position.Services;
 
 namespace WebDevelopment.API.Controllers;
 
@@ -8,33 +11,125 @@ namespace WebDevelopment.API.Controllers;
 [Authorize]
 public class PositionController : ControllerBase
 {
-    [HttpGet()]
-    public ActionResult GetAllPositions()
+    private readonly IPositionService _positionService;
+
+    public PositionController(IPositionService positionService)
     {
-        return Ok();
+        _positionService = positionService;
+    }
+
+    [HttpGet()]
+    public async Task<ActionResult> GetAllPositions()
+    {
+        try
+        {
+            var result = await _positionService.GetAllAsync();
+            return Ok(new ResponseWrapper<IEnumerable<PositionWithIdRequest>>()
+            {
+                Result = result
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status400BadRequest, new ResponseWrapper<object>()
+            {
+                Errors = new List<Error>()
+                {
+                    new Error{Message = ex.Message}
+                }
+            });
+        }
     }
 
     [HttpGet("{id:int}")]
-    public ActionResult GetPositionById(int id)
+    public async Task<ActionResult> GetPositionById(int id)
     {
-        return Ok();
+        try
+        {
+            var result = await _positionService.GetById(id);
+            return Ok(new ResponseWrapper<PositionWithIdRequest>()
+            {
+                Result = result
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status400BadRequest, new ResponseWrapper<object>()
+            {
+                Errors = new List<Error>()
+                {
+                    new Error{Message = ex.Message}
+                }
+            });
+        }
     }
 
     [HttpGet("{name}")]
-    public ActionResult GetPositionByName(string name)
+    public async Task<ActionResult> GetPositionByName(string name)
     {
-        return Ok();
+        try
+        {
+            var result = await _positionService.GetByName(name);
+            return Ok(new ResponseWrapper<PositionWithIdRequest>()
+            {
+                Result = result
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status400BadRequest, new ResponseWrapper<object>()
+            {
+                Errors = new List<Error>()
+                {
+                    new Error{Message = ex.Message}
+                }
+            });
+        }
     }
 
     [HttpPost()]
-    public ActionResult AddPosition([FromBody] object o)
+    public async Task<ActionResult> AddPosition([FromBody] NewPositionRequest position)
     {
-        return Ok();
+        try
+        {
+            var result = await _positionService.AddNewPositionAsync(position);
+            return Ok(new ResponseWrapper<object>()
+            {
+                Result = result
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status400BadRequest, new ResponseWrapper<object>()
+            {
+                Errors = new List<Error>()
+                {
+                    new Error{Message = ex.Message}
+                }
+            });
+        }
     }
 
     [HttpPut()]
-    public ActionResult UpdatePosition([FromBody] object o)
+    public async Task<ActionResult> UpdatePosition([FromBody] PositionWithIdRequest position)
     {
-        return Ok();
+        try
+        {
+            var result = await _positionService.UpdatePositionAsync(position);
+            return Ok(new ResponseWrapper<object>()
+            {
+                Result = result
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status400BadRequest, new ResponseWrapper<object>()
+            {
+                Errors = new List<Error>()
+                {
+                    new Error{Message = ex.Message}
+                }
+            });
+        }
     }
 }

@@ -6,8 +6,13 @@ using Quartz;
 using WebDevelopment.API.Middleware;
 using WebDevelopment.API.Security;
 using WebDevelopment.API.Extensions;
-using WebDevelopment.Common.Requests.User;
 using WebDevelopment.Common.Requests.User.Validators;
+using WebDevelopment.Domain.Country;
+using WebDevelopment.Domain.Country.Services;
+using WebDevelopment.Domain.Department;
+using WebDevelopment.Domain.Department.Services;
+using WebDevelopment.Domain.Position;
+using WebDevelopment.Domain.Position.Services;
 using WebDevelopment.Domain.User.Services;
 using WebDevelopment.Domain.User;
 using WebDevelopment.HostClient;
@@ -67,13 +72,18 @@ builder.Services.AddAuthorization();
 builder.Services.AddAuthentication(ApiKeyAuthOptions.DefaultScheme)
     .AddApiKeyAuth(autoOptions => { autoOptions.ApiKey = builder.Configuration["Authorization:ApiKey"]; });
 
+builder.Services.AddValidatorsFromAssemblyContaining<BaseUserValidator>();
 builder.Services.AddFluentValidationAutoValidation();
-builder.Services.AddScoped<IValidator<NewUserRequest>, BaseUserValidator>();
-builder.Services.AddScoped<IValidator<UserWithIdRequest>, UpdateUserRequestValidator>();
-builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<ITaskExpirationWorker, TaskExpirationWorker>();
 builder.Services.AddTransient<EmailProviderSetupFactory>();
 builder.Services.AddTransient<IUserRepository, UserRepository>();
+builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddTransient<ICountryRepository, CountryRepository>();
+builder.Services.AddTransient<ICountryService, CountryService>();
+builder.Services.AddTransient<IDepartmentRepository, DepartmentRepository>();
+builder.Services.AddTransient<IDepartmentService, DepartmentService>();
+builder.Services.AddTransient<IPositionRepository, PositionRepository>();
+builder.Services.AddTransient<IPositionService, PositionService>();
 
 builder.Services.AddQuartz(q =>
 {

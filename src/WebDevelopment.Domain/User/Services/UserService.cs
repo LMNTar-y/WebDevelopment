@@ -9,7 +9,7 @@ public class UserService : IUserService
 
     public UserService(IUserRepository userRepository)
     {
-        _userRepository = userRepository;
+        _userRepository = userRepository ?? throw new ArgumentException($"{nameof(userRepository)} was not downloaded from DI"); 
     }
 
     public async Task<IEnumerable<UserWithIdRequest>> GetAllUsers()

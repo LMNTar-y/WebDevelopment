@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WebDevelopment.Common.Requests.Country;
+using WebDevelopment.Domain;
+using WebDevelopment.Domain.Country.Services;
 
 namespace WebDevelopment.API.Controllers
 {
@@ -8,34 +11,126 @@ namespace WebDevelopment.API.Controllers
     [Authorize]
     public class CountryController : ControllerBase
     {
-        [HttpGet()]
-        public ActionResult GetAllCountries()
+        private readonly ICountryService _countryService;
+
+        public CountryController(ICountryService countryService)
         {
-            return Ok();
+            _countryService = countryService;
+        }
+
+        [HttpGet()]
+        public async Task<ActionResult> GetAllCountries()
+        {
+            try
+            {
+                var result = await _countryService.GetAll();
+                return Ok(new ResponseWrapper<IEnumerable<CountryWithIdRequest>>()
+                {
+                    Result = result
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, new ResponseWrapper<object>
+                {
+                    Errors = new List<Error>()
+                    {
+                        new Error{ Message = ex.Message}
+                    }
+                });
+            }
         }
 
         [HttpGet("{id:int}")]
-        public ActionResult GetCountryById(int id)
+        public async Task<ActionResult> GetCountryById(int id)
         {
-            return Ok();
+            try
+            {
+                var result = await _countryService.GetById(id);
+                return Ok(new ResponseWrapper<CountryWithIdRequest>()
+                {
+                    Result = result
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, new ResponseWrapper<object>
+                {
+                    Errors = new List<Error>()
+                    {
+                        new Error{ Message = ex.Message}
+                    }
+                });
+            }
         }
 
         [HttpGet("{name}")]
-        public ActionResult GetCountryByName(string name)
+        public async Task<ActionResult> GetCountryByName(string name)
         {
-            return Ok();
+            try
+            {
+                var result = await _countryService.GetByName(name);
+                return Ok(new ResponseWrapper<CountryWithIdRequest>()
+                {
+                    Result = result
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, new ResponseWrapper<object>
+                {
+                    Errors = new List<Error>()
+                    {
+                        new Error{ Message = ex.Message}
+                    }
+                });
+            }
         }
 
         [HttpPost()]
-        public ActionResult AddCountry([FromBody] object o)
+        public async Task<ActionResult> AddCountry([FromBody] NewCountryRequest newCountry)
         {
-            return Ok();
+            try
+            {
+                var result = await _countryService.AddNewCountryAsync(newCountry);
+                return Ok(new ResponseWrapper<object>()
+                {
+                    Result = result
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new ResponseWrapper<object>
+                {
+                    Errors = new List<Error>()
+                    {
+                        new Error{ Message = ex.Message}
+                    }
+                });
+            }
         }
 
         [HttpPut()]
-        public ActionResult UpdateCountry([FromBody] object o)
+        public async Task<ActionResult> UpdateCountry([FromBody] CountryWithIdRequest country)
         {
-            return Ok();
+            try
+            {
+                var result = await _countryService.UpdateCountryAsync(country);
+                return Ok(new ResponseWrapper<object>()
+                {
+                    Result = result
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new ResponseWrapper<object>
+                {
+                    Errors = new List<Error>()
+                    {
+                        new Error{ Message = ex.Message}
+                    }
+                });
+            }
         }
     }
 }

@@ -11,7 +11,7 @@ public class UserRepository : IUserRepository
 
     public UserRepository(WebDevelopmentContext context)
     {
-        _context = context;
+        _context = context ?? throw new ArgumentException($"{nameof(context)} was not downloaded from DI"); ;
     }
 
     public async Task<IEnumerable<UserWithIdRequest>> GetAll()
@@ -37,7 +37,7 @@ public class UserRepository : IUserRepository
     }
 
     #region Mappers
-    private static User Map(IUserRequest userRequest)
+    private static User Map(NewUserRequest userRequest)
     {
         return new User
         {
