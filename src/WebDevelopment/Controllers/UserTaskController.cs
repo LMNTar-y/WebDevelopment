@@ -1,30 +1,31 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WebDevelopment.Common.Requests.UserSalary;
+using WebDevelopment.Common.Requests.UserTask;
 using WebDevelopment.Domain;
-using WebDevelopment.Domain.UserSalary.Services;
+using WebDevelopment.Domain.UserTask.Services;
 
 namespace WebDevelopment.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
 [Authorize]
-public class UsersSalaryController : ControllerBase
+public class UserTaskController : ControllerBase
 {
-    private readonly IUserSalaryService _userSalaryService;
+    private readonly IUserTaskService _userTaskService;
 
-    public UsersSalaryController(IUserSalaryService userSalaryService)
+
+    public UserTaskController(IUserTaskService userTaskService)
     {
-        _userSalaryService = userSalaryService;
+        _userTaskService = userTaskService;
     }
 
     [HttpGet()]
-    public async Task<ActionResult> GetAllUsersSalaryPositions()
+    public async Task<ActionResult> GetAllUsersTasksPositions()
     {
         try
         {
-            var result = await _userSalaryService.GetAllAsync();
-            return Ok(new ResponseWrapper<IEnumerable<UserSalaryWithIdRequest>>()
+            var result = await _userTaskService.GetAllAsync();
+            return Ok(new ResponseWrapper<IEnumerable<UserTaskWithIdRequest>>()
             {
                 Result = result
             });
@@ -49,8 +50,8 @@ public class UsersSalaryController : ControllerBase
     {
         try
         {
-            var result = await _userSalaryService.GetById(id);
-            return Ok(new ResponseWrapper<UserSalaryWithIdRequest>()
+            var result = await _userTaskService.GetById(id);
+            return Ok(new ResponseWrapper<UserTaskWithIdRequest>()
             {
                 Result = result
             });
@@ -71,11 +72,11 @@ public class UsersSalaryController : ControllerBase
     }
 
     [HttpPost()]
-    public async Task<ActionResult> AddUsersSalary([FromBody] NewUserSalaryRequest userSalaryRequest)
+    public async Task<ActionResult> AddUsersSalary([FromBody] NewUserTaskRequest userSalaryRequest)
     {
         try
         {
-            var result = await _userSalaryService.AddNewUserSalaryAsync(userSalaryRequest);
+            var result = await _userTaskService.AddNewUseTaskAsync(userSalaryRequest);
             return Ok(new ResponseWrapper<object>()
             {
                 Result = result
@@ -97,11 +98,11 @@ public class UsersSalaryController : ControllerBase
     }
 
     [HttpPut()]
-    public async Task<ActionResult> UpdateUsersSalary([FromBody] UserSalaryWithIdRequest userSalaryRequest)
+    public async Task<ActionResult> UpdateUsersSalary([FromBody] UserTaskWithIdRequest userSalaryRequest)
     {
         try
         {
-            var result = await _userSalaryService.UpdateUserSalaryAsync(userSalaryRequest);
+            var result = await _userTaskService.UpdateUserTaskAsync(userSalaryRequest);
             return Ok(new ResponseWrapper<object>()
             {
                 Result = result

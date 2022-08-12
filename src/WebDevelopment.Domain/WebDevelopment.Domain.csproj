@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -13,6 +13,10 @@
   <ItemGroup>
     <Folder Include="Department\Services\" />
     <Folder Include="Position\Services\" />
+    <Folder Include="SalaryRange\Services\" />
+    <Folder Include="Task\Services\" />
+    <Folder Include="UserPosition\Services\" />
+    <Folder Include="UserTask\Services\" />
   </ItemGroup>
 
 </Project>

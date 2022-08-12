@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WebDevelopment.Common.Requests.SalaryRange;
+using WebDevelopment.Domain;
+using WebDevelopment.Domain.SalaryRange.Services;
 
 namespace WebDevelopment.API.Controllers;
 
@@ -8,28 +11,142 @@ namespace WebDevelopment.API.Controllers;
 [Authorize]
 public class SalaryRangeController : ControllerBase
 {
-    [HttpGet()]
-    public ActionResult GetAllSalaryRanges()
+    private readonly ISalaryRangeService _salaryRangeService;
+
+    public SalaryRangeController(ISalaryRangeService salaryRangeService)
     {
-        return Ok();
+        _salaryRangeService = salaryRangeService;
+    }
+
+    [HttpGet()]
+    public async Task<ActionResult> GetAllSalaryRanges()
+    {
+        try
+        {
+            var result = await _salaryRangeService.GetAllAsync();
+            return Ok(new ResponseWrapper<IEnumerable<SalaryRangeWithIdRequest>>()
+            {
+                Result = result
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status400BadRequest, new ResponseWrapper<object>()
+            {
+                Errors = new List<Error>()
+                {
+                    new Error()
+                    {
+                        Message = ex.Message
+                    }
+                }
+            });
+        }
     }
 
     [HttpGet("{id:int}")]
-    public ActionResult GetSalaryRangeById(int id)
+    public async Task<ActionResult> GetSalaryRangeById(int id)
     {
-        return Ok();
+        try
+        {
+            var result = await _salaryRangeService.GetById(id);
+            return Ok(new ResponseWrapper<SalaryRangeWithIdRequest>()
+            {
+                Result = result
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status400BadRequest, new ResponseWrapper<object>()
+            {
+                Errors = new List<Error>()
+                {
+                    new Error()
+                    {
+                        Message = ex.Message
+                    }
+                }
+            });
+        }
+    }
+
+    [HttpGet("{positionName}")]
+    public async Task<ActionResult> GetSalaryRangeById(string positionName)
+    {
+        try
+        {
+            var result = await _salaryRangeService.GetByPositionName(positionName);
+            return Ok(new ResponseWrapper<IEnumerable<SalaryRangeWithIdRequest>>()
+            {
+                Result = result
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status400BadRequest, new ResponseWrapper<object>()
+            {
+                Errors = new List<Error>()
+                {
+                    new Error()
+                    {
+                        Message = ex.Message
+                    }
+                }
+            });
+        }
     }
 
 
     [HttpPost()]
-    public ActionResult AddSalaryRange([FromBody] object o)
+    public async Task<ActionResult> AddSalaryRange([FromBody] NewSalaryRangeRequest salaryRange)
     {
-        return Ok();
+        try
+        {
+            var result = await _salaryRangeService.AddNewSalaryRangeAsync(salaryRange);
+            return Ok(new ResponseWrapper<object>()
+            {
+                Result = result
+            });
+        }
+        catch (Exception e)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new ResponseWrapper<object>()
+            {
+                Errors = new List<Error>()
+                {
+                    new Error()
+                    {
+                        Message = e.Message
+                    }
+                }
+            });
+        }
     }
 
     [HttpPut()]
-    public ActionResult UpdateSalaryRange([FromBody] object o)
+    public async Task<ActionResult> UpdateSalaryRange([FromBody] SalaryRangeWithIdRequest salaryRange)
     {
-        return Ok();
+        try
+        {
+            var result = await _salaryRangeService.UpdateSalaryRangeAsync(salaryRange);
+            return Ok(new ResponseWrapper<object>()
+            {
+                Result = result
+            });
+        }
+        catch (Exception e)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new ResponseWrapper<object>()
+            {
+                Errors = new List<Error>()
+                {
+                    new Error()
+                    {
+                        Message = e.Message
+                    }
+                }
+            });
+        }
     }
 }
+

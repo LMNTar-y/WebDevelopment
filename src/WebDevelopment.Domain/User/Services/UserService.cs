@@ -7,9 +7,9 @@ public class UserService : IUserService
 {
     private readonly IUserRepository _userRepository;
 
-    public UserService(IUserRepository userRepository)
+    public UserService(IUserRepository userRepository, ITestUserRepo userRepo)
     {
-        _userRepository = userRepository ?? throw new ArgumentException($"{nameof(userRepository)} was not downloaded from DI"); 
+        _userRepository = userRepository ?? throw new ArgumentException($"{nameof(userRepository)} was not downloaded from DI");
     }
 
     public async Task<IEnumerable<UserWithIdRequest>> GetAllUsers()
@@ -28,7 +28,7 @@ public class UserService : IUserService
 
     public async Task<UserWithIdRequest> GetUserByEmail(string userEmail)
     {
-        var result = (await _userRepository.GetAll()).FirstOrDefault(x => x.UserEmail == userEmail) ??
+        var result = (await _userRepository.GetAll()).FirstOrDefault(x => string.Equals(x.UserEmail, userEmail, StringComparison.CurrentCultureIgnoreCase)) ??
                      throw new ArgumentNullException(nameof(userEmail), $"User with {userEmail} has not fount in the DataBase");
 
         return result;

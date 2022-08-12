@@ -20,14 +20,14 @@ public class PositionService : IPositionService
     public async Task<PositionWithIdRequest> GetById(int id)
     {
         var position = (await _positionRepository.GetAll()).FirstOrDefault(x => x.Id == id) ??
-                       throw new ArgumentNullException(nameof(id), $"Position with id:\"{id}\" has not fount in the DataBase"); ;
+                       throw new ArgumentNullException(nameof(id), $"Position with id:\"{id}\" has not fount in the DataBase"); 
         return position;
     }
 
     public async Task<PositionWithIdRequest> GetByName(string name)
     {
-        var position = (await _positionRepository.GetAll()).FirstOrDefault(x => x.Name == name) ??
-                       throw new ArgumentNullException(nameof(name), $"Position with name:\"{name}\" has not fount in the DataBase"); ;
+        var position = (await _positionRepository.GetAll()).FirstOrDefault(x => string.Equals(x.Name, name, StringComparison.CurrentCultureIgnoreCase)) ??
+                       throw new ArgumentNullException(nameof(name), $"Position with name:\"{name}\" has not fount in the DataBase"); 
         return position;
     }
 

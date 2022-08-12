@@ -13,8 +13,18 @@ using WebDevelopment.Domain.Department;
 using WebDevelopment.Domain.Department.Services;
 using WebDevelopment.Domain.Position;
 using WebDevelopment.Domain.Position.Services;
+using WebDevelopment.Domain.SalaryRange;
+using WebDevelopment.Domain.SalaryRange.Services;
+using WebDevelopment.Domain.Task;
+using WebDevelopment.Domain.Task.Services;
 using WebDevelopment.Domain.User.Services;
 using WebDevelopment.Domain.User;
+using WebDevelopment.Domain.UserPosition;
+using WebDevelopment.Domain.UserPosition.Services;
+using WebDevelopment.Domain.UserSalary;
+using WebDevelopment.Domain.UserSalary.Services;
+using WebDevelopment.Domain.UserTask;
+using WebDevelopment.Domain.UserTask.Services;
 using WebDevelopment.HostClient;
 using WebDevelopment.HostClient.Implementation;
 using WebDevelopment.HostClient.Interfaces;
@@ -84,6 +94,16 @@ builder.Services.AddTransient<IDepartmentRepository, DepartmentRepository>();
 builder.Services.AddTransient<IDepartmentService, DepartmentService>();
 builder.Services.AddTransient<IPositionRepository, PositionRepository>();
 builder.Services.AddTransient<IPositionService, PositionService>();
+builder.Services.AddTransient<ITaskRepository, TaskRepository>();
+builder.Services.AddTransient<ITaskService, TaskService>();
+builder.Services.AddTransient<ISalaryRangeRepository, SalaryRangeRepository>();
+builder.Services.AddTransient<ISalaryRangeService, SalaryRangeService>();
+builder.Services.AddTransient<IUserPositionRepository, UserPositionRepository>();
+builder.Services.AddTransient<IUserPositionService, UserPositionService>();
+builder.Services.AddTransient<IUserSalaryRepository, UserSalaryRepository>();
+builder.Services.AddTransient<IUserSalaryService, UserSalaryService>();
+builder.Services.AddTransient<IUserTaskRepository, UserTaskRepository>();
+builder.Services.AddTransient<IUserTaskService, UserTaskService>();
 
 builder.Services.AddQuartz(q =>
 {
