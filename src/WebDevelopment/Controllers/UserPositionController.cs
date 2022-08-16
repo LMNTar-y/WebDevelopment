@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using WebDevelopment.Common.Requests.UserPosition;
 using WebDevelopment.Domain;
-using WebDevelopment.Domain.UserPosition.Services;
 
 namespace WebDevelopment.API.Controllers;
 
@@ -11,11 +10,12 @@ namespace WebDevelopment.API.Controllers;
 [Authorize]
 public class UserPositionController : ControllerBase
 {
-    private readonly IUserPositionService _userPositionService;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public UserPositionController(IUserPositionService userPositionService)
+
+    public UserPositionController(IUnitOfWork unitOfWork)
     {
-        _userPositionService = userPositionService;
+        _unitOfWork = unitOfWork;
     }
 
     [HttpGet()]
@@ -23,8 +23,8 @@ public class UserPositionController : ControllerBase
     {
         try
         {
-            var result = await _userPositionService.GetAllAsync();
-            return Ok(new ResponseWrapper<IEnumerable<UserPositionWithIdRequest>>()
+            var result = await _unitOfWork.UserPositionRepo.GetAllAsync();
+            return Ok(new ResponseWrapper<IEnumerable<IUserPositionRequest>>()
             {
                 Result = result
             });
@@ -49,8 +49,8 @@ public class UserPositionController : ControllerBase
     {
         try
         {
-            var result = await _userPositionService.GetById(id);
-            return Ok(new ResponseWrapper<UserPositionWithIdRequest>()
+            var result = await _unitOfWork.UserPositionRepo.GetByIdAsync(id);
+            return Ok(new ResponseWrapper<IUserPositionRequest>()
             {
                 Result = result
             });
@@ -75,8 +75,8 @@ public class UserPositionController : ControllerBase
     {
         try
         {
-            var result = await _userPositionService.GetByUserNameAsync(firstName, secondName);
-            return Ok(new ResponseWrapper<IEnumerable<UserPositionWithIdRequest>>()
+            var result = await _unitOfWork.UserPositionRepo.GetByUserNameAsync(firstName, secondName);
+            return Ok(new ResponseWrapper<IEnumerable<IUserPositionRequest>>()
             {
                 Result = result
             });
@@ -101,7 +101,7 @@ public class UserPositionController : ControllerBase
     {
         try
         {
-            var result = await _userPositionService.AddNewUserPositionAsync(userPosition);
+            var result = await _unitOfWork.UserPositionRepo.AddAsync(userPosition);
             return Ok(new ResponseWrapper<object>()
             {
                 Result = result
@@ -128,7 +128,7 @@ public class UserPositionController : ControllerBase
     {
         try
         {
-            var result = await _userPositionService.UpdateUserPositionAsync(userPosition);
+            var result = await _unitOfWork.UserPositionRepo.UpdateAsync(userPosition);
             return Ok(new ResponseWrapper<object>()
             {
                 Result = result

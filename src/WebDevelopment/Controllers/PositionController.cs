@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using WebDevelopment.Common.Requests.Position;
 using WebDevelopment.Domain;
-using WebDevelopment.Domain.Position.Services;
 
 namespace WebDevelopment.API.Controllers;
 
@@ -11,11 +10,11 @@ namespace WebDevelopment.API.Controllers;
 [Authorize]
 public class PositionController : ControllerBase
 {
-    private readonly IPositionService _positionService;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public PositionController(IPositionService positionService)
+    public PositionController(IUnitOfWork unitOfWork)
     {
-        _positionService = positionService;
+        _unitOfWork = unitOfWork;
     }
 
     [HttpGet()]
@@ -23,8 +22,8 @@ public class PositionController : ControllerBase
     {
         try
         {
-            var result = await _positionService.GetAllAsync();
-            return Ok(new ResponseWrapper<IEnumerable<PositionWithIdRequest>>()
+            var result = await _unitOfWork.PositionRepo.GetAllAsync();
+            return Ok(new ResponseWrapper<IEnumerable<IPositionRequest>>()
             {
                 Result = result
             });
@@ -46,8 +45,8 @@ public class PositionController : ControllerBase
     {
         try
         {
-            var result = await _positionService.GetById(id);
-            return Ok(new ResponseWrapper<PositionWithIdRequest>()
+            var result = await _unitOfWork.PositionRepo.GetByIdAsync(id);
+            return Ok(new ResponseWrapper<IPositionRequest>()
             {
                 Result = result
             });
@@ -69,8 +68,8 @@ public class PositionController : ControllerBase
     {
         try
         {
-            var result = await _positionService.GetByName(name);
-            return Ok(new ResponseWrapper<PositionWithIdRequest>()
+            var result = await _unitOfWork.PositionRepo.GetByNameAsync(name);
+            return Ok(new ResponseWrapper<IPositionRequest>()
             {
                 Result = result
             });
@@ -92,7 +91,7 @@ public class PositionController : ControllerBase
     {
         try
         {
-            var result = await _positionService.AddNewPositionAsync(position);
+            var result = await _unitOfWork.PositionRepo.AddAsync(position);
             return Ok(new ResponseWrapper<object>()
             {
                 Result = result
@@ -115,7 +114,7 @@ public class PositionController : ControllerBase
     {
         try
         {
-            var result = await _positionService.UpdatePositionAsync(position);
+            var result = await _unitOfWork.PositionRepo.UpdateAsync(position);
             return Ok(new ResponseWrapper<object>()
             {
                 Result = result

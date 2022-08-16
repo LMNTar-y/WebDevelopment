@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using WebDevelopment.Common.Requests.Department;
 using WebDevelopment.Domain;
-using WebDevelopment.Domain.Department.Services;
 
 namespace WebDevelopment.API.Controllers;
 
@@ -11,11 +10,12 @@ namespace WebDevelopment.API.Controllers;
 [Authorize]
 public class DepartmentController : ControllerBase
 {
-    private readonly IDepartmentService _departmentService;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public DepartmentController(IDepartmentService departmentService)
+
+    public DepartmentController(IUnitOfWork unitOfWork)
     {
-        _departmentService = departmentService;
+        _unitOfWork = unitOfWork;
     }
 
     [HttpGet]
@@ -23,8 +23,8 @@ public class DepartmentController : ControllerBase
     {
         try
         {
-            var result = await _departmentService.GetAllAsync();
-            return Ok(new ResponseWrapper<IEnumerable<DepartmentWithIdRequest>>()
+            var result = await _unitOfWork.DepartmentRepo.GetAllAsync();
+            return Ok(new ResponseWrapper<IEnumerable<IDepartmentRequest>>()
             {
                 Result = result
             });
@@ -46,8 +46,8 @@ public class DepartmentController : ControllerBase
     {
         try
         {
-            var result = await _departmentService.GetById(id);
-            return Ok(new ResponseWrapper<DepartmentWithIdRequest>()
+            var result = await _unitOfWork.DepartmentRepo.GetByIdAsync(id);
+            return Ok(new ResponseWrapper<IDepartmentRequest>()
             {
                 Result = result
             });
@@ -69,8 +69,8 @@ public class DepartmentController : ControllerBase
     {
         try
         {
-            var result = await _departmentService.GetByName(name);
-            return Ok(new ResponseWrapper<DepartmentWithIdRequest>()
+            var result = await _unitOfWork.DepartmentRepo.GetByNameAsync(name);
+            return Ok(new ResponseWrapper<IDepartmentRequest>()
             {
                 Result = result
             });
@@ -95,7 +95,7 @@ public class DepartmentController : ControllerBase
     {
         try
         {
-            var result = await _departmentService.AddNewDepartmentAsync(department);
+            var result = await _unitOfWork.DepartmentRepo.AddAsync(department);
             return Ok(new ResponseWrapper<object>()
             {
                 Result = result
@@ -121,7 +121,7 @@ public class DepartmentController : ControllerBase
     {
         try
         {
-            var result = await _departmentService.UpdateDepartmentAsync(department);
+            var result = await _unitOfWork.DepartmentRepo.UpdateAsync(department);
             return Ok(new ResponseWrapper<object>()
             {
                 Result = result

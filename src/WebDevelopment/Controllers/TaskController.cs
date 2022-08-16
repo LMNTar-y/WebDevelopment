@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using WebDevelopment.Common.Requests.Task;
 using WebDevelopment.Domain;
-using WebDevelopment.Domain.Task.Services;
 
 namespace WebDevelopment.API.Controllers;
 
@@ -11,11 +10,11 @@ namespace WebDevelopment.API.Controllers;
 [Authorize]
 public class TaskController : ControllerBase
 {
-    private readonly ITaskService _taskService;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public TaskController(ITaskService taskService)
+    public TaskController(IUnitOfWork unitOfWork)
     {
-        _taskService = taskService;
+        _unitOfWork = unitOfWork;
     }
 
     [HttpGet()]
@@ -23,8 +22,8 @@ public class TaskController : ControllerBase
     {
         try
         {
-            var result = await _taskService.GetAllAsync();
-            return Ok(new ResponseWrapper<IEnumerable<TaskWithIdRequest>>()
+            var result = await _unitOfWork.TaskRepo.GetAllAsync();
+            return Ok(new ResponseWrapper<IEnumerable<ITaskRequest>>()
             {
                 Result = result
             });
@@ -46,8 +45,8 @@ public class TaskController : ControllerBase
     {
         try
         {
-            var result = await _taskService.GetById(id);
-            return Ok(new ResponseWrapper<TaskWithIdRequest>()
+            var result = await _unitOfWork.TaskRepo.GetByIdAsync(id);
+            return Ok(new ResponseWrapper<ITaskRequest>()
             {
                 Result = result
             });
@@ -69,8 +68,8 @@ public class TaskController : ControllerBase
     {
         try
         {
-            var result = await _taskService.GetByName(name);
-            return Ok(new ResponseWrapper<TaskWithIdRequest>()
+            var result = await _unitOfWork.TaskRepo.GetByName(name);
+            return Ok(new ResponseWrapper<ITaskRequest>()
             {
                 Result = result
             });
@@ -92,7 +91,7 @@ public class TaskController : ControllerBase
     {
         try
         {
-            var result = await _taskService.AddNewTaskAsync(task);
+            var result = await _unitOfWork.TaskRepo.AddAsync(task);
             return Ok(new ResponseWrapper<object>()
             {
                 Result = result
@@ -115,7 +114,7 @@ public class TaskController : ControllerBase
     {
         try
         {
-            var result = await _taskService.UpdateTaskAsync(task);
+            var result = await _unitOfWork.TaskRepo.UpdateAsync(task);
             return Ok(new ResponseWrapper<object>()
             {
                 Result = result

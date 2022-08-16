@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using WebDevelopment.Common.Requests.UserSalary;
 using WebDevelopment.Domain;
-using WebDevelopment.Domain.UserSalary.Services;
 
 namespace WebDevelopment.API.Controllers;
 
@@ -11,11 +10,10 @@ namespace WebDevelopment.API.Controllers;
 [Authorize]
 public class UsersSalaryController : ControllerBase
 {
-    private readonly IUserSalaryService _userSalaryService;
-
-    public UsersSalaryController(IUserSalaryService userSalaryService)
+    private readonly IUnitOfWork _unitOfWork;
+    public UsersSalaryController(IUnitOfWork unitOfWork)
     {
-        _userSalaryService = userSalaryService;
+        _unitOfWork = unitOfWork;
     }
 
     [HttpGet()]
@@ -23,8 +21,8 @@ public class UsersSalaryController : ControllerBase
     {
         try
         {
-            var result = await _userSalaryService.GetAllAsync();
-            return Ok(new ResponseWrapper<IEnumerable<UserSalaryWithIdRequest>>()
+            var result = await _unitOfWork.UserSalaryRepo.GetAllAsync();
+            return Ok(new ResponseWrapper<IEnumerable<IUserSalaryRequest>>()
             {
                 Result = result
             });
@@ -49,8 +47,8 @@ public class UsersSalaryController : ControllerBase
     {
         try
         {
-            var result = await _userSalaryService.GetById(id);
-            return Ok(new ResponseWrapper<UserSalaryWithIdRequest>()
+            var result = await _unitOfWork.UserSalaryRepo.GetByIdAsync(id);
+            return Ok(new ResponseWrapper<IUserSalaryRequest>()
             {
                 Result = result
             });
@@ -75,7 +73,7 @@ public class UsersSalaryController : ControllerBase
     {
         try
         {
-            var result = await _userSalaryService.AddNewUserSalaryAsync(userSalaryRequest);
+            var result = await _unitOfWork.UserSalaryRepo.AddAsync(userSalaryRequest);
             return Ok(new ResponseWrapper<object>()
             {
                 Result = result
@@ -101,7 +99,7 @@ public class UsersSalaryController : ControllerBase
     {
         try
         {
-            var result = await _userSalaryService.UpdateUserSalaryAsync(userSalaryRequest);
+            var result = await _unitOfWork.UserSalaryRepo.UpdateAsync(userSalaryRequest);
             return Ok(new ResponseWrapper<object>()
             {
                 Result = result

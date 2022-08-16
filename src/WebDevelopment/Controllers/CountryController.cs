@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using WebDevelopment.Common.Requests.Country;
 using WebDevelopment.Domain;
-using WebDevelopment.Domain.Country.Services;
 
 namespace WebDevelopment.API.Controllers
 {
@@ -11,11 +10,10 @@ namespace WebDevelopment.API.Controllers
     [Authorize]
     public class CountryController : ControllerBase
     {
-        private readonly ICountryService _countryService;
-
-        public CountryController(ICountryService countryService)
+        private readonly IUnitOfWork _unitOfWork;
+        public CountryController(IUnitOfWork unitOfWork)
         {
-            _countryService = countryService;
+            _unitOfWork = unitOfWork;
         }
 
         [HttpGet()]
@@ -23,8 +21,8 @@ namespace WebDevelopment.API.Controllers
         {
             try
             {
-                var result = await _countryService.GetAll();
-                return Ok(new ResponseWrapper<IEnumerable<CountryWithIdRequest>>()
+                var result = await _unitOfWork.CountryRepo.GetAllAsync();
+                return Ok(new ResponseWrapper<IEnumerable<ICountryRequest>>()
                 {
                     Result = result
                 });
@@ -46,8 +44,8 @@ namespace WebDevelopment.API.Controllers
         {
             try
             {
-                var result = await _countryService.GetById(id);
-                return Ok(new ResponseWrapper<CountryWithIdRequest>()
+                var result = await _unitOfWork.CountryRepo.GetByIdAsync(id);
+                return Ok(new ResponseWrapper<ICountryRequest>()
                 {
                     Result = result
                 });
@@ -69,8 +67,8 @@ namespace WebDevelopment.API.Controllers
         {
             try
             {
-                var result = await _countryService.GetByName(name);
-                return Ok(new ResponseWrapper<CountryWithIdRequest>()
+                var result = await _unitOfWork.CountryRepo.GetByNameAsync(name);
+                return Ok(new ResponseWrapper<ICountryRequest>()
                 {
                     Result = result
                 });
@@ -92,7 +90,7 @@ namespace WebDevelopment.API.Controllers
         {
             try
             {
-                var result = await _countryService.AddNewCountryAsync(newCountry);
+                var result = await _unitOfWork.CountryRepo.AddAsync(newCountry);
                 return Ok(new ResponseWrapper<object>()
                 {
                     Result = result
@@ -115,7 +113,7 @@ namespace WebDevelopment.API.Controllers
         {
             try
             {
-                var result = await _countryService.UpdateCountryAsync(country);
+                var result = await _unitOfWork.CountryRepo.UpdateAsync(country);
                 return Ok(new ResponseWrapper<object>()
                 {
                     Result = result

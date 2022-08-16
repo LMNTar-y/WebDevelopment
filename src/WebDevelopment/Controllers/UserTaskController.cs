@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using WebDevelopment.Common.Requests.UserTask;
 using WebDevelopment.Domain;
-using WebDevelopment.Domain.UserTask.Services;
 
 namespace WebDevelopment.API.Controllers;
 
@@ -11,12 +10,11 @@ namespace WebDevelopment.API.Controllers;
 [Authorize]
 public class UserTaskController : ControllerBase
 {
-    private readonly IUserTaskService _userTaskService;
+    private readonly IUnitOfWork _unitOfWork;
 
-
-    public UserTaskController(IUserTaskService userTaskService)
+    public UserTaskController(IUnitOfWork unitOfWork)
     {
-        _userTaskService = userTaskService;
+        _unitOfWork = unitOfWork;
     }
 
     [HttpGet()]
@@ -24,8 +22,8 @@ public class UserTaskController : ControllerBase
     {
         try
         {
-            var result = await _userTaskService.GetAllAsync();
-            return Ok(new ResponseWrapper<IEnumerable<UserTaskWithIdRequest>>()
+            var result = await _unitOfWork.UserTaskRepo.GetAllAsync();
+            return Ok(new ResponseWrapper<IEnumerable<IUserTaskRequest>>()
             {
                 Result = result
             });
@@ -50,8 +48,8 @@ public class UserTaskController : ControllerBase
     {
         try
         {
-            var result = await _userTaskService.GetById(id);
-            return Ok(new ResponseWrapper<UserTaskWithIdRequest>()
+            var result = await _unitOfWork.UserTaskRepo.GetByIdAsync(id);
+            return Ok(new ResponseWrapper<IUserTaskRequest>()
             {
                 Result = result
             });
@@ -76,7 +74,7 @@ public class UserTaskController : ControllerBase
     {
         try
         {
-            var result = await _userTaskService.AddNewUseTaskAsync(userSalaryRequest);
+            var result = await _unitOfWork.UserTaskRepo.AddAsync(userSalaryRequest);
             return Ok(new ResponseWrapper<object>()
             {
                 Result = result
@@ -102,7 +100,7 @@ public class UserTaskController : ControllerBase
     {
         try
         {
-            var result = await _userTaskService.UpdateUserTaskAsync(userSalaryRequest);
+            var result = await _unitOfWork.UserTaskRepo.UpdateAsync(userSalaryRequest);
             return Ok(new ResponseWrapper<object>()
             {
                 Result = result

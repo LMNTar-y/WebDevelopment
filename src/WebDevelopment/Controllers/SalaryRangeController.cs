@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using WebDevelopment.Common.Requests.SalaryRange;
 using WebDevelopment.Domain;
-using WebDevelopment.Domain.SalaryRange.Services;
 
 namespace WebDevelopment.API.Controllers;
 
@@ -11,11 +10,12 @@ namespace WebDevelopment.API.Controllers;
 [Authorize]
 public class SalaryRangeController : ControllerBase
 {
-    private readonly ISalaryRangeService _salaryRangeService;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public SalaryRangeController(ISalaryRangeService salaryRangeService)
+
+    public SalaryRangeController(IUnitOfWork unitOfWork)
     {
-        _salaryRangeService = salaryRangeService;
+        _unitOfWork = unitOfWork;
     }
 
     [HttpGet()]
@@ -23,8 +23,8 @@ public class SalaryRangeController : ControllerBase
     {
         try
         {
-            var result = await _salaryRangeService.GetAllAsync();
-            return Ok(new ResponseWrapper<IEnumerable<SalaryRangeWithIdRequest>>()
+            var result = await _unitOfWork.SalaryRangeRepo.GetAllAsync();
+            return Ok(new ResponseWrapper<IEnumerable<ISalaryRangeRequest>>()
             {
                 Result = result
             });
@@ -49,8 +49,8 @@ public class SalaryRangeController : ControllerBase
     {
         try
         {
-            var result = await _salaryRangeService.GetById(id);
-            return Ok(new ResponseWrapper<SalaryRangeWithIdRequest>()
+            var result = await _unitOfWork.SalaryRangeRepo.GetByIdAsync(id);
+            return Ok(new ResponseWrapper<ISalaryRangeRequest>()
             {
                 Result = result
             });
@@ -75,8 +75,8 @@ public class SalaryRangeController : ControllerBase
     {
         try
         {
-            var result = await _salaryRangeService.GetByPositionName(positionName);
-            return Ok(new ResponseWrapper<IEnumerable<SalaryRangeWithIdRequest>>()
+            var result = await _unitOfWork.SalaryRangeRepo.GetByPositionNameAsync(positionName);
+            return Ok(new ResponseWrapper<IEnumerable<ISalaryRangeRequest>>()
             {
                 Result = result
             });
@@ -102,7 +102,7 @@ public class SalaryRangeController : ControllerBase
     {
         try
         {
-            var result = await _salaryRangeService.AddNewSalaryRangeAsync(salaryRange);
+            var result = await _unitOfWork.SalaryRangeRepo.AddAsync(salaryRange);
             return Ok(new ResponseWrapper<object>()
             {
                 Result = result
@@ -128,7 +128,7 @@ public class SalaryRangeController : ControllerBase
     {
         try
         {
-            var result = await _salaryRangeService.UpdateSalaryRangeAsync(salaryRange);
+            var result = await _unitOfWork.SalaryRangeRepo.UpdateAsync(salaryRange);
             return Ok(new ResponseWrapper<object>()
             {
                 Result = result

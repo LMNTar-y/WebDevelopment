@@ -7,36 +7,17 @@ using WebDevelopment.API.Middleware;
 using WebDevelopment.API.Security;
 using WebDevelopment.API.Extensions;
 using WebDevelopment.Common.Requests.User.Validators;
-using WebDevelopment.Domain.Country;
-using WebDevelopment.Domain.Country.Services;
-using WebDevelopment.Domain.Department;
-using WebDevelopment.Domain.Department.Services;
-using WebDevelopment.Domain.Position;
-using WebDevelopment.Domain.Position.Services;
-using WebDevelopment.Domain.SalaryRange;
-using WebDevelopment.Domain.SalaryRange.Services;
-using WebDevelopment.Domain.Task;
-using WebDevelopment.Domain.Task.Services;
-using WebDevelopment.Domain.User.Services;
-using WebDevelopment.Domain.User;
-using WebDevelopment.Domain.UserPosition;
-using WebDevelopment.Domain.UserPosition.Services;
-using WebDevelopment.Domain.UserSalary;
-using WebDevelopment.Domain.UserSalary.Services;
-using WebDevelopment.Domain.UserTask;
-using WebDevelopment.Domain.UserTask.Services;
 using WebDevelopment.HostClient;
 using WebDevelopment.HostClient.Implementation;
 using WebDevelopment.HostClient.Interfaces;
 using WebDevelopment.Email.Model;
 using WebDevelopment.Email.Settings;
 using WebDevelopment.Infrastructure;
-using WebDevelopment.Infrastructure.Repositories;
-
+using WebDevelopment.Domain;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// AddAsync services to the container.
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -86,24 +67,8 @@ builder.Services.AddValidatorsFromAssemblyContaining<BaseUserValidator>();
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddTransient<ITaskExpirationWorker, TaskExpirationWorker>();
 builder.Services.AddTransient<EmailProviderSetupFactory>();
-builder.Services.AddTransient<IUserRepository, UserRepository>();
-builder.Services.AddTransient<IUserService, UserService>();
-builder.Services.AddTransient<ICountryRepository, CountryRepository>();
-builder.Services.AddTransient<ICountryService, CountryService>();
-builder.Services.AddTransient<IDepartmentRepository, DepartmentRepository>();
-builder.Services.AddTransient<IDepartmentService, DepartmentService>();
-builder.Services.AddTransient<IPositionRepository, PositionRepository>();
-builder.Services.AddTransient<IPositionService, PositionService>();
-builder.Services.AddTransient<ITaskRepository, TaskRepository>();
-builder.Services.AddTransient<ITaskService, TaskService>();
-builder.Services.AddTransient<ISalaryRangeRepository, SalaryRangeRepository>();
-builder.Services.AddTransient<ISalaryRangeService, SalaryRangeService>();
-builder.Services.AddTransient<IUserPositionRepository, UserPositionRepository>();
-builder.Services.AddTransient<IUserPositionService, UserPositionService>();
-builder.Services.AddTransient<IUserSalaryRepository, UserSalaryRepository>();
-builder.Services.AddTransient<IUserSalaryService, UserSalaryService>();
-builder.Services.AddTransient<IUserTaskRepository, UserTaskRepository>();
-builder.Services.AddTransient<IUserTaskService, UserTaskService>();
+builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
+
 
 builder.Services.AddQuartz(q =>
 {

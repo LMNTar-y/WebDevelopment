@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using WebDevelopment.Common.Requests.User;
 using WebDevelopment.Domain;
-using WebDevelopment.Domain.User.Services;
 
 namespace WebDevelopment.API.Controllers;
 
@@ -11,11 +10,11 @@ namespace WebDevelopment.API.Controllers;
 [Authorize]
 public class UserController : ControllerBase
 {
-    private readonly IUserService _userService;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public UserController(IUserService userService)
+    public UserController(IUnitOfWork unitOfWork)
     {
-        _userService = userService;
+        _unitOfWork = unitOfWork;
     }
 
     [HttpGet]
@@ -23,8 +22,8 @@ public class UserController : ControllerBase
     {
         try
         {
-            var result = await _userService.GetAllUsers();
-            return Ok(new ResponseWrapper<IEnumerable<UserWithIdRequest>>()
+            var result = await _unitOfWork.UserRepo.GetAllAsync();
+            return Ok(new ResponseWrapper<IEnumerable<IUserRequest>>()
             {
                 Result = result
             });
@@ -42,12 +41,12 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("{id:int}")]
-    public async Task<IActionResult> GetUserById(int id)
+    public async Task<IActionResult> GetById(int id)
     {
         try
         {
-            var result = await _userService.GetUserById(id);
-            return Ok(new ResponseWrapper<UserWithIdRequest>()
+            var result = await _unitOfWork.UserRepo.GetByIdAsync(id);
+            return Ok(new ResponseWrapper<IUserRequest>()
             {
                 Result = result
             });
@@ -57,9 +56,9 @@ public class UserController : ControllerBase
             return StatusCode(StatusCodes.Status404NotFound, new ResponseWrapper<object>
             {
                 Errors = new List<Error>()
-                {
-                    new Error{ Message = ex.Message}
-                }
+                 {
+                     new Error{ Message = ex.Message}
+                 }
             });
         }
     }
@@ -69,8 +68,8 @@ public class UserController : ControllerBase
     {
         try
         {
-            var result = await _userService.GetUserByEmail(userEmail);
-            return Ok(new ResponseWrapper<UserWithIdRequest>()
+            var result = await _unitOfWork.UserRepo.GetUserByEmail(userEmail);
+            return Ok(new ResponseWrapper<IUserRequest>()
             {
                 Result = result
             });
@@ -92,7 +91,7 @@ public class UserController : ControllerBase
     {
         try
         {
-            var result = await _userService.CreateNewUserAsync(userRequest);
+            var result = await _unitOfWork.UserRepo.AddAsync(userRequest);
             return Ok(new ResponseWrapper<object>()
             {
                 Result = result
@@ -115,7 +114,7 @@ public class UserController : ControllerBase
     {
         try
         {
-            var result = await _userService.UpdateUserAsync(userWithIdRequest);
+            var result = await _unitOfWork.UserRepo.UpdateAsync(userWithIdRequest);
             return Ok(new ResponseWrapper<object>()
             {
                 Result = result
