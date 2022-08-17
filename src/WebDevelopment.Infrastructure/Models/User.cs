@@ -1,4 +1,6 @@
-﻿namespace WebDevelopment.Infrastructure.Models
+﻿using WebDevelopment.Infrastructure.Models.Auth;
+
+namespace WebDevelopment.Infrastructure.Models
 {
     public partial class User
     {
@@ -18,5 +20,6 @@
         public virtual ICollection<UserPosition> UserPositions { get; set; }
         public virtual ICollection<UsersSalary> UsersSalaries { get; set; }
         public virtual ICollection<UserTask> UserTasks { get; set; }
+        public virtual AuthUserModel? AuthUserModel { get; set; }
     }
 }

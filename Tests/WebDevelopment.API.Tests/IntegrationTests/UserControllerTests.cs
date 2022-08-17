@@ -7,28 +7,27 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using WebDevelopment.Common.Requests.User;
-using WebDevelopment.Domain.User.Services;
 
 namespace WebDevelopment.API.Tests.IntegrationTests;
 
 public class UserControllerTests
 {
-    private readonly Mock<IUserService> _userServiceMock = new();
+    //private readonly Mock<IUserService> _userServiceMock = new();
     private readonly WebApplicationFactory<Program> _factory = new();
     private readonly HttpClient _client;
 
     public UserControllerTests()
     {
-        _userServiceMock.Setup(us => us.UpdateUserAsync(It.IsAny<UserWithIdRequest>()));
-        _userServiceMock.Setup(us => us.CreateNewUserAsync(It.IsAny<NewUserRequest>()));
-        _userServiceMock.Setup(us => us.GetUserById(It.Is<int>(i => i > 0))).ReturnsAsync(() => new UserWithIdRequest());
-        _userServiceMock.Setup(us => us.GetUserByEmail(It.IsAny<string>())).ReturnsAsync(() => new UserWithIdRequest());
-        _userServiceMock.Setup(us => us.GetAllUsers()).ReturnsAsync(() => new List<UserWithIdRequest>());
+        //_userServiceMock.Setup(us => us.UpdateUserAsync(It.IsAny<UserWithIdRequest>()));
+        //_userServiceMock.Setup(us => us.CreateNewUserAsync(It.IsAny<NewUserRequest>()));
+        //_userServiceMock.Setup(us => us.GetUserById(It.Is<int>(i => i > 0))).ReturnsAsync(() => new UserWithIdRequest());
+        //_userServiceMock.Setup(us => us.GetUserByEmail(It.IsAny<string>())).ReturnsAsync(() => new UserWithIdRequest());
+        //_userServiceMock.Setup(us => us.GetAllUsers()).ReturnsAsync(() => new List<UserWithIdRequest>());
         _client = _factory.WithWebHostBuilder(
                 builder => builder.ConfigureTestServices(
                     services =>
                     {
-                        services.AddTransient(_ => _userServiceMock.Object);
+                        //services.AddTransient(_ => _userServiceMock.Object);
                         services.AddAuthentication("Test")
                             .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("Test", _ => { });
                     }))

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebDevelopment.Infrastructure;
 
@@ -11,9 +12,10 @@ using WebDevelopment.Infrastructure;
 namespace WebDevelopment.Infrastructure.Migrations
 {
     [DbContext(typeof(WebDevelopmentContext))]
-    partial class WebDevelopmentContextModelSnapshot : ModelSnapshot
+    [Migration("20220817190144_AddAuthUserModel")]
+    partial class AddAuthUserModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

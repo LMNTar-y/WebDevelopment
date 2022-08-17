@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WebDevelopment.Infrastructure.Models;
+using WebDevelopment.Infrastructure.Models.Auth;
 
 namespace WebDevelopment.Infrastructure
 {
@@ -14,6 +15,7 @@ namespace WebDevelopment.Infrastructure
         {
         }
 
+        public virtual DbSet<AuthUserModel> AuthUserModels { get; set; } = null!;
         public virtual DbSet<Country> Countries { get; set; } = null!;
         public virtual DbSet<Department> Departments { get; set; } = null!;
         public virtual DbSet<Position> Positions { get; set; } = null!;
@@ -28,15 +30,31 @@ namespace WebDevelopment.Infrastructure
         {
             if (!optionsBuilder.IsConfigured)
             {
-                throw new ArgumentException("ConnectionString is not configured properly", nameof(optionsBuilder));
+                throw new ArgumentException("ConnectionString is ;not configured properly", nameof(optionsBuilder));
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<AuthUserModel>(entity =>
+            {
+                entity.Property(e => e.Password).HasMaxLength(255);
+                entity.Property(e => e.UserName).HasMaxLength(25);
+                
+                entity.HasOne(e => e.User)
+                    .WithOne(u => u.AuthUserModel)
+                    .HasForeignKey<AuthUserModel>(u => u.UserId);
+            });
+
             modelBuilder.Entity<Country>(entity =>
             {
                 entity.ToTable("Country");
+
+                entity.HasIndex(e => e.Alpha3Code, "UC_Country_Code")
+                    .IsUnique();
+
+                entity.HasIndex(e => e.Name, "UC_Country_Name")
+                    .IsUnique();
 
                 entity.Property(e => e.Alpha3Code).HasMaxLength(10);
 
@@ -80,8 +98,17 @@ namespace WebDevelopment.Infrastructure
                     .HasConstraintName("FK__SalaryRan__Posit__412EB0B6");
             });
 
+            modelBuilder.Entity<Models.Task>(entity =>
+            {
+                entity.Property(e => e.CreationDate).HasDefaultValueSql("(sysdatetimeoffset())");
+
+                entity.Property(e => e.Name).HasMaxLength(255);
+            });
+
             modelBuilder.Entity<User>(entity =>
             {
+                entity.Property(e => e.Active).HasDefaultValueSql("((1))");
+
                 entity.Property(e => e.FirstName).HasMaxLength(255);
 
                 entity.Property(e => e.SecondName).HasMaxLength(255);
@@ -91,6 +118,9 @@ namespace WebDevelopment.Infrastructure
 
             modelBuilder.Entity<UserPosition>(entity =>
             {
+                entity.HasIndex(e => new { e.UserId, e.PositionId, e.DepartmentId, e.StartDate }, "UC_Person")
+                    .IsUnique();
+
                 entity.Property(e => e.StartDate).HasDefaultValueSql("(sysdatetimeoffset())");
 
                 entity.HasOne(d => d.Department)
@@ -109,6 +139,25 @@ namespace WebDevelopment.Infrastructure
                     .HasConstraintName("FK__UserPosit__UserI__47DBAE45");
             });
 
+            modelBuilder.Entity<UserTask>(entity =>
+            {
+                entity.HasIndex(e => e.TaskId, "IX_UserTasks_TaskId");
+
+                entity.HasIndex(e => e.UserId, "IX_UserTasks_UserId");
+
+                entity.Property(e => e.StartDate).HasDefaultValueSql("(sysdatetimeoffset())");
+
+                entity.Property(e => e.ValidTill).HasDefaultValueSql("(dateadd(day,(7),sysdatetimeoffset()))");
+
+                entity.HasOne(d => d.Task)
+                    .WithMany(p => p.UserTasks)
+                    .HasForeignKey(d => d.TaskId);
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.UserTasks)
+                    .HasForeignKey(d => d.UserId);
+            });
+
             modelBuilder.Entity<UsersSalary>(entity =>
             {
                 entity.ToTable("UsersSalary");
@@ -122,30 +171,7 @@ namespace WebDevelopment.Infrastructure
                     .HasForeignKey(d => d.UserId)
                     .HasConstraintName("FK__UsersSala__UserI__440B1D61");
             });
-
-            modelBuilder.Entity<Models.Task>(entity =>
-            {
-                entity.Property(e => e.Name).HasMaxLength(255);
-
-                entity.Property(e => e.CreationDate).HasDefaultValueSql("(sysdatetimeoffset())");
-
-            });
-
-            modelBuilder.Entity<UserTask>(entity =>
-            {
-                entity.Property(e => e.StartDate).HasDefaultValueSql("(sysdatetimeoffset())");
-                entity.Property(e => e.ValidTill).HasDefaultValueSql("DATEADD(day, 7, sysdatetimeoffset())");
-
-                entity.HasOne(d => d.User)
-                    .WithMany(p => p.UserTasks)
-                    .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK_UserTasks_Users_UserId");
-
-                entity.HasOne(d => d.Task)
-                    .WithMany(p => p.UserTasks)
-                    .HasForeignKey(d => d.TaskId)
-                    .HasConstraintName("FK_UserTasks_Tasks_TaskId");
-            });
+            
         }
     }
 }

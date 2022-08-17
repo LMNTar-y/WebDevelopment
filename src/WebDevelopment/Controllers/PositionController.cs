@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebDevelopment.Common.Requests.Position;
 using WebDevelopment.Domain;
@@ -7,7 +8,7 @@ namespace WebDevelopment.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class PositionController : ControllerBase
 {
     private readonly IUnitOfWork _unitOfWork;

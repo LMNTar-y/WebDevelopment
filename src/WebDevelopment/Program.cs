@@ -1,6 +1,9 @@
+using System.Text;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Quartz;
 using WebDevelopment.API.Middleware;
@@ -14,6 +17,7 @@ using WebDevelopment.Email.Model;
 using WebDevelopment.Email.Settings;
 using WebDevelopment.Infrastructure;
 using WebDevelopment.Domain;
+using WebDevelopment.Infrastructure.Repos;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,8 +44,17 @@ builder.Services.AddSwaggerGen(c =>
         In = ParameterLocation.Header,
         Description = "Please insert ApiKey into the field",
         Name = "Authorization",
+        Scheme = "ApiKey",
         Type = SecuritySchemeType.ApiKey
     });
+
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+    {
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        Description = "Input bearer token to access this API",
+    });
+
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
@@ -53,21 +66,46 @@ builder.Services.AddSwaggerGen(c =>
                     Id = "ApiKey"
                 }
             },
-            new string[] { }
+            new string[] {}
+        },
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new[] { "WebDevelopment API" }
         }
     });
 });
 
 builder.Services.AddAuthorization();
 
-builder.Services.AddAuthentication(ApiKeyAuthOptions.DefaultScheme)
-    .AddApiKeyAuth(autoOptions => { autoOptions.ApiKey = builder.Configuration["Authorization:ApiKey"]; });
+builder.Services.AddAuthentication()
+    .AddApiKeyAuth(ApiKeyAuthOptions.DefaultScheme, autoOptions => { autoOptions.ApiKey = builder.Configuration["Authorization:ApiKey"]; })
+    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+        };
+    });
 
 builder.Services.AddValidatorsFromAssemblyContaining<BaseUserValidator>();
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddTransient<ITaskExpirationWorker, TaskExpirationWorker>();
 builder.Services.AddTransient<EmailProviderSetupFactory>();
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
+builder.Services.AddTransient<AuthUserModelRepo>();
 
 
 builder.Services.AddQuartz(q =>
