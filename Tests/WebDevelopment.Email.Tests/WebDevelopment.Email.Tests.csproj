@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\WebDevelopment.Email\WebDevelopment.Email.csproj" />
+    <ProjectReference Include="..\..\src\WebDevelopment.Email\WebDevelopment.Email.csproj" />
   </ItemGroup>
 
 </Project>
