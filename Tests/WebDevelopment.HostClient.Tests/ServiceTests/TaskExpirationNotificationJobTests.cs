@@ -1,9 +1,6 @@
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Moq;
 using WebDevelopment.Email.Model;
 using WebDevelopment.Email.Settings;
-using WebDevelopment.HostClient.Interfaces;
 using WebDevelopment.HostClient.Tests.ServiceMocks;
 
 namespace WebDevelopment.HostClient.Tests.ServiceTests

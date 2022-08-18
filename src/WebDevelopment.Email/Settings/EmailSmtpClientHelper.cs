@@ -24,8 +24,7 @@ public abstract class EmailSmtpClientHelper : IDisposable
         _logger = serviceProvider.GetRequiredService<ILogger<EmailSmtpClientHelper>>();
         _emailProviderSettings = serviceProvider.GetRequiredService<IConfiguration>()
             .GetSection($"{nameof(EmailSettings)}:{nameof(EmailProviderSettings)}:{emailProviderName}")
-            .Get<EmailProviderSettings>() ?? throw new ArgumentNullException(nameof(serviceProvider),
-            $"Error with receiving settings for {_emailProviderSettings} from the appsettings file");
+            .Get<EmailProviderSettings>();
         From = new MailAddress(_emailProviderSettings.EmailSendFrom, "WebDevelopment");
         SmtpClientSendMailAsyncWrapper = new SmtpClientSendMailAsyncWrapper();
     }

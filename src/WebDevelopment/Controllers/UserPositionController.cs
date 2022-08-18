@@ -1,34 +1,152 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WebDevelopment.Common.Requests.UserPosition;
+using WebDevelopment.Domain;
 
 namespace WebDevelopment.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class UserPositionController : ControllerBase
 {
-    [HttpGet()]
-    public ActionResult GetAllUserPositions()
+    private readonly IUnitOfWork _unitOfWork;
+
+
+    public UserPositionController(IUnitOfWork unitOfWork)
     {
-        return Ok();
+        _unitOfWork = unitOfWork;
+    }
+
+    [HttpGet()]
+    public async Task<ActionResult> GetAllUserPositions()
+    {
+        try
+        {
+            var result = await _unitOfWork.UserPositionRepo.GetAllAsync();
+            return Ok(new ResponseWrapper<IEnumerable<IUserPositionRequest>>()
+            {
+                Result = result
+            });
+        }
+        catch (Exception e)
+        {
+            return StatusCode(StatusCodes.Status400BadRequest, new ResponseWrapper<object>()
+            {
+                Errors = new List<Error>()
+                {
+                    new()
+                    {
+                        Message = e.Message
+                    }
+                }
+            });
+        }
     }
 
     [HttpGet("{id:int}")]
-    public ActionResult GetUserPositionById(int id)
+    public async Task<ActionResult> GetUserPositionById(int id)
     {
-        return Ok();
+        try
+        {
+            var result = await _unitOfWork.UserPositionRepo.GetByIdAsync(id);
+            return Ok(new ResponseWrapper<IUserPositionRequest>()
+            {
+                Result = result
+            });
+        }
+        catch (Exception e)
+        {
+            return StatusCode(StatusCodes.Status404NotFound, new ResponseWrapper<object>()
+            {
+                Errors = new List<Error>()
+                {
+                    new()
+                    {
+                        Message = e.Message
+                    }
+                }
+            });
+        }
+    }
+
+    [HttpGet("{firstName}/{secondName}")]
+    public async Task<ActionResult> GetUserPositionByUserName(string firstName, string secondName)
+    {
+        try
+        {
+            var result = await _unitOfWork.UserPositionRepo.GetByUserNameAsync(firstName, secondName);
+            return Ok(new ResponseWrapper<IEnumerable<IUserPositionRequest>>()
+            {
+                Result = result
+            });
+        }
+        catch (Exception e)
+        {
+            return StatusCode(StatusCodes.Status400BadRequest, new ResponseWrapper<object>()
+            {
+                Errors = new List<Error>()
+                {
+                    new()
+                    {
+                        Message = e.Message
+                    }
+                }
+            });
+        }
     }
 
     [HttpPost()]
-    public ActionResult AddUserPosition([FromBody] object o)
+    public async Task<ActionResult> AddUserPosition([FromBody] NewUserPositionRequest userPosition)
     {
-        return Ok();
+        try
+        {
+            var result = await _unitOfWork.UserPositionRepo.AddAsync(userPosition);
+            return Ok(new ResponseWrapper<object>()
+            {
+                Result = result
+            });
+        }
+        catch (Exception e)
+        {
+            return StatusCode(StatusCodes.Status404NotFound, new ResponseWrapper<object>()
+            {
+                Errors = new List<Error>()
+                {
+                    new()
+                    {
+                        Message = e.Message
+                    }
+                }
+            });
+        }
     }
 
+
     [HttpPut()]
-    public ActionResult UpdateUserPosition([FromBody] object o)
+    public async Task<ActionResult> UpdateUserPosition([FromBody] UserPositionWithIdRequest userPosition)
     {
-        return Ok();
+        try
+        {
+            var result = await _unitOfWork.UserPositionRepo.UpdateAsync(userPosition);
+            return Ok(new ResponseWrapper<object>()
+            {
+                Result = result
+            });
+        }
+        catch (Exception e)
+        {
+            return StatusCode(StatusCodes.Status404NotFound, new ResponseWrapper<object>()
+            {
+                Errors = new List<Error>()
+                {
+                    new()
+                    {
+                        Message = e.Message
+                    }
+                }
+            });
+        }
     }
 }

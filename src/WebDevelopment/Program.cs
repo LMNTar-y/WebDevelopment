@@ -1,24 +1,28 @@
+using System.Text;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Quartz;
 using WebDevelopment.API.Middleware;
-using WebDevelopment.API.Model;
-using WebDevelopment.API.Model.Validators;
 using WebDevelopment.API.Security;
-using WebDevelopment.API.Services;
+using WebDevelopment.API.Extensions;
+using WebDevelopment.Common.Requests.User.Validators;
 using WebDevelopment.HostClient;
 using WebDevelopment.HostClient.Implementation;
 using WebDevelopment.HostClient.Interfaces;
-using WebDevelopment.Infrastructure;
-using WebDevelopment.API.Extensions;
 using WebDevelopment.Email.Model;
 using WebDevelopment.Email.Settings;
+using WebDevelopment.Infrastructure;
+using WebDevelopment.Domain;
+using WebDevelopment.Infrastructure.Repos;
+using WebDevelopment.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// AddAsync services to the container.
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -41,8 +45,17 @@ builder.Services.AddSwaggerGen(c =>
         In = ParameterLocation.Header,
         Description = "Please insert ApiKey into the field",
         Name = "Authorization",
+        Scheme = "ApiKey",
         Type = SecuritySchemeType.ApiKey
     });
+
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+    {
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        Description = "Input bearer token to access this API",
+    });
+
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
@@ -54,22 +67,48 @@ builder.Services.AddSwaggerGen(c =>
                     Id = "ApiKey"
                 }
             },
-            new string[] { }
+            new string[] {}
+        },
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new[] { "WebDevelopment API" }
         }
     });
 });
 
 builder.Services.AddAuthorization();
 
-builder.Services.AddAuthentication(ApiKeyAuthOptions.DefaultScheme)
-    .AddApiKeyAuth(autoOptions => { autoOptions.ApiKey = builder.Configuration["Authorization:ApiKey"]; });
+builder.Services.AddAuthentication()
+    .AddApiKeyAuth(ApiKeyAuthOptions.DefaultScheme, autoOptions => { autoOptions.ApiKey = builder.Configuration["Authorization:ApiKey"]; })
+    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+        };
+    });
 
+builder.Services.AddValidatorsFromAssemblyContaining<BaseUserValidator>();
 builder.Services.AddFluentValidationAutoValidation();
-builder.Services.AddScoped<IValidator<NewUserRequest>, BaseUserValidator>();
-builder.Services.AddScoped<IValidator<UpdateUserRequest>, UpdateUserRequestValidator>();
-builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<ITaskExpirationWorker, TaskExpirationWorker>();
 builder.Services.AddTransient<EmailProviderSetupFactory>();
+builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
+builder.Services.AddTransient<IAuthUserModelRepo, AuthUserModelRepo>();
+builder.Services.AddTransient<ILoginService, LoginService>();
+
 
 builder.Services.AddQuartz(q =>
 {

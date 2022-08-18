@@ -22,6 +22,53 @@ namespace WebDevelopment.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
+            modelBuilder.Entity("WebDevelopment.Infrastructure.Models.Auth.AuthUserModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("Role")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SecuredPassword")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("UserEmail")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(25)
+                        .HasColumnType("nvarchar(25)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasFilter("[UserId] IS NOT NULL");
+
+                    b.HasIndex(new[] { "SecuredPassword" }, "UC_Secured_Password")
+                        .IsUnique()
+                        .HasFilter("[SecuredPassword] IS NOT NULL");
+
+                    b.HasIndex(new[] { "UserEmail" }, "UC_User_Email")
+                        .IsUnique()
+                        .HasFilter("[UserEmail] IS NOT NULL");
+
+                    b.HasIndex(new[] { "UserName" }, "UC_User_Name")
+                        .IsUnique()
+                        .HasFilter("[UserName] IS NOT NULL");
+
+                    b.ToTable("AuthUserModels");
+                });
+
             modelBuilder.Entity("WebDevelopment.Infrastructure.Models.Country", b =>
                 {
                     b.Property<int>("Id")
@@ -39,6 +86,14 @@ namespace WebDevelopment.Infrastructure.Migrations
                         .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex(new[] { "Alpha3Code" }, "UC_Country_Code")
+                        .IsUnique()
+                        .HasFilter("[Alpha3Code] IS NOT NULL");
+
+                    b.HasIndex(new[] { "Name" }, "UC_Country_Name")
+                        .IsUnique()
+                        .HasFilter("[Name] IS NOT NULL");
 
                     b.ToTable("Country", (string)null);
                 });
@@ -149,7 +204,9 @@ namespace WebDevelopment.Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<bool?>("Active")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValueSql("((1))");
 
                     b.Property<string>("FirstName")
                         .HasMaxLength(255)
@@ -164,6 +221,11 @@ namespace WebDevelopment.Infrastructure.Migrations
                         .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex(new[] { "UserEmail" }, "UC_User_Email")
+                        .IsUnique()
+                        .HasDatabaseName("UC_User_Email1")
+                        .HasFilter("[UserEmail] IS NOT NULL");
 
                     b.ToTable("Users");
                 });
@@ -199,7 +261,9 @@ namespace WebDevelopment.Infrastructure.Migrations
 
                     b.HasIndex("PositionId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex(new[] { "UserId", "PositionId", "DepartmentId", "StartDate" }, "UC_Person")
+                        .IsUnique()
+                        .HasFilter("[UserId] IS NOT NULL AND [PositionId] IS NOT NULL AND [DepartmentId] IS NOT NULL AND [StartDate] IS NOT NULL");
 
                     b.ToTable("UserPositions");
                 });
@@ -255,15 +319,24 @@ namespace WebDevelopment.Infrastructure.Migrations
                     b.Property<DateTimeOffset?>("ValidTill")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetimeoffset")
-                        .HasDefaultValueSql("DATEADD(day, 7, sysdatetimeoffset())");
+                        .HasDefaultValueSql("(dateadd(day,(7),sysdatetimeoffset()))");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TaskId");
+                    b.HasIndex(new[] { "TaskId" }, "IX_UserTasks_TaskId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex(new[] { "UserId" }, "IX_UserTasks_UserId");
 
                     b.ToTable("UserTasks");
+                });
+
+            modelBuilder.Entity("WebDevelopment.Infrastructure.Models.Auth.AuthUserModel", b =>
+                {
+                    b.HasOne("WebDevelopment.Infrastructure.Models.User", "User")
+                        .WithOne("AuthUserModel")
+                        .HasForeignKey("WebDevelopment.Infrastructure.Models.Auth.AuthUserModel", "UserId");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("WebDevelopment.Infrastructure.Models.SalaryRange", b =>
@@ -323,15 +396,13 @@ namespace WebDevelopment.Infrastructure.Migrations
                         .WithMany("UserTasks")
                         .HasForeignKey("TaskId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("FK_UserTasks_Tasks_TaskId");
+                        .IsRequired();
 
                     b.HasOne("WebDevelopment.Infrastructure.Models.User", "User")
                         .WithMany("UserTasks")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("FK_UserTasks_Users_UserId");
+                        .IsRequired();
 
                     b.Navigation("Task");
 
@@ -362,6 +433,8 @@ namespace WebDevelopment.Infrastructure.Migrations
 
             modelBuilder.Entity("WebDevelopment.Infrastructure.Models.User", b =>
                 {
+                    b.Navigation("AuthUserModel");
+
                     b.Navigation("UserPositions");
 
                     b.Navigation("UserTasks");

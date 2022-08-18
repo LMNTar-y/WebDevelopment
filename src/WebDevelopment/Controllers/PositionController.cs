@@ -1,40 +1,135 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WebDevelopment.Common.Requests.Position;
+using WebDevelopment.Domain;
 
 namespace WebDevelopment.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class PositionController : ControllerBase
 {
-    [HttpGet()]
-    public ActionResult GetAllPositions()
+    private readonly IUnitOfWork _unitOfWork;
+
+    public PositionController(IUnitOfWork unitOfWork)
     {
-        return Ok();
+        _unitOfWork = unitOfWork;
+    }
+
+    [HttpGet()]
+    public async Task<ActionResult> GetAllPositions()
+    {
+        try
+        {
+            var result = await _unitOfWork.PositionRepo.GetAllAsync();
+            return Ok(new ResponseWrapper<IEnumerable<IPositionRequest>>()
+            {
+                Result = result
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status400BadRequest, new ResponseWrapper<object>()
+            {
+                Errors = new List<Error>()
+                {
+                    new Error{Message = ex.Message}
+                }
+            });
+        }
     }
 
     [HttpGet("{id:int}")]
-    public ActionResult GetPositionById(int id)
+    public async Task<ActionResult> GetPositionById(int id)
     {
-        return Ok();
+        try
+        {
+            var result = await _unitOfWork.PositionRepo.GetByIdAsync(id);
+            return Ok(new ResponseWrapper<IPositionRequest>()
+            {
+                Result = result
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status400BadRequest, new ResponseWrapper<object>()
+            {
+                Errors = new List<Error>()
+                {
+                    new Error{Message = ex.Message}
+                }
+            });
+        }
     }
 
     [HttpGet("{name}")]
-    public ActionResult GetPositionByName(string name)
+    public async Task<ActionResult> GetPositionByName(string name)
     {
-        return Ok();
+        try
+        {
+            var result = await _unitOfWork.PositionRepo.GetByNameAsync(name);
+            return Ok(new ResponseWrapper<IPositionRequest>()
+            {
+                Result = result
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status400BadRequest, new ResponseWrapper<object>()
+            {
+                Errors = new List<Error>()
+                {
+                    new Error{Message = ex.Message}
+                }
+            });
+        }
     }
 
     [HttpPost()]
-    public ActionResult AddPosition([FromBody] object o)
+    public async Task<ActionResult> AddPosition([FromBody] NewPositionRequest position)
     {
-        return Ok();
+        try
+        {
+            var result = await _unitOfWork.PositionRepo.AddAsync(position);
+            return Ok(new ResponseWrapper<object>()
+            {
+                Result = result
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status400BadRequest, new ResponseWrapper<object>()
+            {
+                Errors = new List<Error>()
+                {
+                    new Error{Message = ex.Message}
+                }
+            });
+        }
     }
 
     [HttpPut()]
-    public ActionResult UpdatePosition([FromBody] object o)
+    public async Task<ActionResult> UpdatePosition([FromBody] PositionWithIdRequest position)
     {
-        return Ok();
+        try
+        {
+            var result = await _unitOfWork.PositionRepo.UpdateAsync(position);
+            return Ok(new ResponseWrapper<object>()
+            {
+                Result = result
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status400BadRequest, new ResponseWrapper<object>()
+            {
+                Errors = new List<Error>()
+                {
+                    new Error{Message = ex.Message}
+                }
+            });
+        }
     }
 }

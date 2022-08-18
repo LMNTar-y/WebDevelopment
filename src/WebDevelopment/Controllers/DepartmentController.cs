@@ -1,40 +1,145 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WebDevelopment.Common.Requests.Department;
+using WebDevelopment.Domain;
 
 namespace WebDevelopment.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class DepartmentController : ControllerBase
 {
-    [HttpGet()]
-    public ActionResult GetAllDepartments()
+    private readonly IUnitOfWork _unitOfWork;
+
+
+    public DepartmentController(IUnitOfWork unitOfWork)
     {
-        return Ok();
+        _unitOfWork = unitOfWork;
     }
 
-    [HttpGet("{id:int}")]
-    public ActionResult GetDepartmentById(int id)
+    [HttpGet]
+    public async Task<ActionResult> GetAllDepartments()
     {
-        return Ok();
+        try
+        {
+            var result = await _unitOfWork.DepartmentRepo.GetAllAsync();
+            return Ok(new ResponseWrapper<IEnumerable<IDepartmentRequest>>()
+            {
+                Result = result
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status400BadRequest, new ResponseWrapper<object>()
+            {
+                Errors = new List<Error>()
+                {
+                    new Error{Message = ex.Message}
+                }
+            });
+        }
+    }
+
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult> GetDepartmentById(Guid id)
+    {
+        try
+        {
+            var result = await _unitOfWork.DepartmentRepo.GetByIdAsync(id);
+            return Ok(new ResponseWrapper<IDepartmentRequest>()
+            {
+                Result = result
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status404NotFound, new ResponseWrapper<object>()
+            {
+                Errors = new List<Error>()
+                {
+                    new Error(){Message = ex.Message}
+                }
+            });
+        }
     }
 
     [HttpGet("{name}")]
-    public ActionResult GetDepartmentByName(string name)
+    public async Task<ActionResult> GetDepartmentByName(string name)
     {
-        return Ok();
+        try
+        {
+            var result = await _unitOfWork.DepartmentRepo.GetByNameAsync(name);
+            return Ok(new ResponseWrapper<IDepartmentRequest>()
+            {
+                Result = result
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status404NotFound, new ResponseWrapper<object>()
+            {
+                Errors = new List<Error>()
+                {
+                    new Error()
+                    {
+                        Message = ex.Message
+                    }
+                }
+            });
+        }
     }
 
     [HttpPost()]
-    public ActionResult AddDepartment([FromBody] object o)
+    public async Task<ActionResult> AddDepartment([FromBody] NewDepartmentRequest department)
     {
-        return Ok();
+        try
+        {
+            var result = await _unitOfWork.DepartmentRepo.AddAsync(department);
+            return Ok(new ResponseWrapper<object>()
+            {
+                Result = result
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new ResponseWrapper<object>()
+            {
+                Errors = new List<Error>()
+                {
+                    new Error()
+                    {
+                        Message = ex.Message
+                    }
+                }
+            });
+        }
     }
 
     [HttpPut()]
-    public ActionResult UpdateDepartment([FromBody] object o)
+    public async Task<ActionResult> UpdateDepartment([FromBody] DepartmentWithIdRequest department)
     {
-        return Ok();
+        try
+        {
+            var result = await _unitOfWork.DepartmentRepo.UpdateAsync(department);
+            return Ok(new ResponseWrapper<object>()
+            {
+                Result = result
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new ResponseWrapper<object>()
+            {
+                Errors = new List<Error>()
+                {
+                    new Error()
+                    {
+                        Message = ex.Message
+                    }
+                }
+            });
+        }
     }
 }
