@@ -18,6 +18,7 @@ using WebDevelopment.Email.Settings;
 using WebDevelopment.Infrastructure;
 using WebDevelopment.Domain;
 using WebDevelopment.Infrastructure.Repos;
+using WebDevelopment.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -105,7 +106,8 @@ builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddTransient<ITaskExpirationWorker, TaskExpirationWorker>();
 builder.Services.AddTransient<EmailProviderSetupFactory>();
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
-builder.Services.AddTransient<AuthUserModelRepo>();
+builder.Services.AddTransient<IAuthUserModelRepo, AuthUserModelRepo>();
+builder.Services.AddTransient<ILoginService, LoginService>();
 
 
 builder.Services.AddQuartz(q =>

@@ -1,12 +1,8 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using WebDevelopment.API.Security.LoginModel;
-using WebDevelopment.Infrastructure.Models.Auth;
-using WebDevelopment.Infrastructure.Repos;
+using WebDevelopment.API.Services;
+using WebDevelopment.Common.Requests.LoginModel;
+using WebDevelopment.Domain;
 
 namespace WebDevelopment.API.Controllers;
 
@@ -15,56 +11,57 @@ namespace WebDevelopment.API.Controllers;
 [Authorize(AuthenticationSchemes = "ApiKey")]
 public class LoginController : ControllerBase
 {
-    private readonly IConfiguration _configuration;
-    private readonly AuthUserModelRepo _userRepo;
+    private readonly ILoginService _loginService;
 
-    public LoginController(IConfiguration configuration, AuthUserModelRepo userRepo)
+    public LoginController(ILoginService loginService)
     {
-        _configuration = configuration;
-        _userRepo = userRepo;
+        _loginService = loginService;
     }
 
     //[AllowAnonymous]
-    [HttpPost]
-    public IActionResult Login([FromBody] UserLogin userLogin)
+    [HttpPost()]
+    public async Task<IActionResult> Login([FromBody] UserLogin userLogin)
     {
-        var user = Authenticate(userLogin);
-
-        if (user != null)
+        try
         {
-            var token = Generate(user);
-            return Ok(token);
+            var token = await _loginService.LoginAsync(userLogin);
+            return Ok(new ResponseWrapper<string>()
+            {
+                Result = token
+            });
         }
-
-        return NotFound("User not found");
-    }
-
-    private string Generate(AuthUserModel user)
-    {
-        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-        var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
-        var claims = new[]
+        catch (Exception ex)
         {
-            new Claim(ClaimTypes.NameIdentifier, user.UserName!),
-            new Claim(ClaimTypes.Role, user.Role.ToString()),
-            new Claim(ClaimTypes.Name, user.User!.FirstName!),
-            new Claim(ClaimTypes.Surname, user.User.SecondName!),
-            new Claim(ClaimTypes.Email, user.User.UserEmail!)
-        };
-
-        var token = new JwtSecurityToken(_configuration["Jwt:Issuer"],
-            _configuration["Jwt:Audience"],
-            claims,
-            expires: DateTime.Now.AddMinutes(15),
-            signingCredentials: credentials);
-
-        return new JwtSecurityTokenHandler().WriteToken(token);
+            return StatusCode(StatusCodes.Status404NotFound, new ResponseWrapper<object>()
+            {
+                Errors = new List<Error>()
+                {
+                    new Error{ Message = ex.Message}
+                }
+            });
+        }
     }
 
-    private AuthUserModel? Authenticate(UserLogin userLogin)
+    [HttpPost("Register")]
+    public async Task<IActionResult> Register([FromBody] NewUserLogin userLogin)
     {
-        var user = _userRepo.GetByNameAndPassword(userLogin.UserName!, userLogin.Password!);
-        return user;
+        try
+        {
+            var result = await _loginService.RegisterAsync(userLogin);
+            return Ok(new ResponseWrapper<object>()
+            {
+                Result = result
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status404NotFound, new ResponseWrapper<object>()
+            {
+                Errors = new List<Error>()
+                {
+                    new Error{ Message = ex.Message}
+                }
+            });
+        }
     }
 }

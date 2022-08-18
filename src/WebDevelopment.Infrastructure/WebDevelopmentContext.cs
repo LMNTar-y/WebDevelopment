@@ -4,7 +4,7 @@ using WebDevelopment.Infrastructure.Models.Auth;
 
 namespace WebDevelopment.Infrastructure
 {
-    public partial class WebDevelopmentContext : DbContext
+    public class WebDevelopmentContext : DbContext
     {
         public WebDevelopmentContext()
         {
@@ -38,9 +38,20 @@ namespace WebDevelopment.Infrastructure
         {
             modelBuilder.Entity<AuthUserModel>(entity =>
             {
-                entity.Property(e => e.Password).HasMaxLength(255);
+                entity.HasIndex(e => e.UserName, "UC_User_Name")
+                    .IsUnique();
+
+                entity.HasIndex(e => e.SecuredPassword, "UC_Secured_Password")
+                    .IsUnique();
+
+                entity.HasIndex(e => e.UserEmail, "UC_User_Email")
+                    .IsUnique();
+
+                entity.Property(e => e.SecuredPassword).HasMaxLength(255);
+
                 entity.Property(e => e.UserName).HasMaxLength(25);
-                
+                entity.Property(e => e.UserEmail).HasMaxLength(255);
+
                 entity.HasOne(e => e.User)
                     .WithOne(u => u.AuthUserModel)
                     .HasForeignKey<AuthUserModel>(u => u.UserId);
@@ -107,6 +118,9 @@ namespace WebDevelopment.Infrastructure
 
             modelBuilder.Entity<User>(entity =>
             {
+                entity.HasIndex(e => e.UserEmail, "UC_User_Email")
+                    .IsUnique();
+
                 entity.Property(e => e.Active).HasDefaultValueSql("((1))");
 
                 entity.Property(e => e.FirstName).HasMaxLength(255);

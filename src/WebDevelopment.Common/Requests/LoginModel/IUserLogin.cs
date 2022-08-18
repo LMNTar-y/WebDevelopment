@@ -1,6 +1,6 @@
-﻿namespace WebDevelopment.API.Security.LoginModel;
+﻿namespace WebDevelopment.Common.Requests.LoginModel;
 
-public class UserLogin
+public interface IUserLogin
 {
     public string? UserName { get; set; }
     public string? Password { get; set; }
