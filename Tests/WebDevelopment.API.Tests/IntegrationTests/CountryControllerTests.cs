@@ -1,27 +1,27 @@
 using System.Net;
 using System.Text;
 using System.Text.Json;
-using WebDevelopment.Common.Requests.User;
+using WebDevelopment.Common.Requests.Country;
 
 namespace WebDevelopment.API.Tests.IntegrationTests;
 
 [Collection("WebApplicationFactory collection")]
-public class UserControllerTests
+public class CountryControllerTests
 {
     private readonly WebApplicationFactorySetupMock _setupMock;
     private readonly HttpClient _client;
 
-    public UserControllerTests(WebApplicationFactorySetupMock setupMock)
+    public CountryControllerTests(WebApplicationFactorySetupMock setupMock)
     {
         _setupMock = setupMock;
         _client = _setupMock.Setup();
-        _client.BaseAddress = new Uri("https://localhost/api/User/");
+        _client.BaseAddress = new Uri("https://localhost/api/Country/");
     }
 
     [Theory]
     [InlineData("")]
     [InlineData("1")]
-    [InlineData("test@example.com")]
+    [InlineData("Lithuania")]
     public async Task GetRequests_ReturnSuccess(string url)
     {
         //Arrange 
@@ -41,7 +41,7 @@ public class UserControllerTests
 
         //Act
         var response = await _client.PostAsync("",
-            new StringContent(JsonSerializer.Serialize(new NewUserRequest()), Encoding.UTF8, "application/json"));
+            new StringContent(JsonSerializer.Serialize(new NewCountryRequest(){Alpha3Code = "QQQQQ"}), Encoding.UTF8, "application/json"));
 
         //Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -51,11 +51,11 @@ public class UserControllerTests
     public async Task PostRequest_PassValidation_ReturnOk()
     {
         // Arrange
-        var user = new NewUserRequest() { FirstName = "Test2", SecondName = "Test2", UserEmail = "test@test.test2" };
+        var coun = new NewCountryRequest() { Name = "Test2", Alpha3Code = "ase"};
 
         //Act
         var response = await _client.PostAsync("",
-            new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json"));
+            new StringContent(JsonSerializer.Serialize(coun), Encoding.UTF8, "application/json"));
 
         //Assert
         Assert.NotNull(response);
@@ -69,7 +69,7 @@ public class UserControllerTests
         // Arrange
         //Act
         var response = await _client.PutAsync("",
-            new StringContent(JsonSerializer.Serialize(new UserWithIdRequest()), Encoding.UTF8, "application/json"));
+            new StringContent(JsonSerializer.Serialize(new CountryWithIdRequest()), Encoding.UTF8, "application/json"));
 
         //Assert
         Assert.NotNull(response);
@@ -81,16 +81,17 @@ public class UserControllerTests
     public async Task PutRequest_PassValidation_ReturnOK()
     {
         // Arrange
-        var user = new UserWithIdRequest()
-        { Id = 1, FirstName = "Test", SecondName = "Test", UserEmail = "test@test.test" };
+        var coun = new CountryWithIdRequest()
+        { Id = 1, Name = "Test", Alpha3Code = "sdw" };
 
         //Act
         var response = await _client.PutAsync("",
-            new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json"));
+            new StringContent(JsonSerializer.Serialize(coun), Encoding.UTF8, "application/json"));
 
         //Assert
         Assert.NotNull(response);
         Assert.NotNull(response.Content);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
+
 }
