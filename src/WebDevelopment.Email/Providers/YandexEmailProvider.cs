@@ -1,7 +1,4 @@
-﻿using System.Net.Mail;
-using System.Text.RegularExpressions;
-using Microsoft.Extensions.Configuration;
-using WebDevelopment.Email.Model;
+﻿using WebDevelopment.Email.Model;
 
 namespace WebDevelopment.Email.Providers;
 

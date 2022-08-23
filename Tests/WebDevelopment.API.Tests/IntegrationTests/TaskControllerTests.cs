@@ -1,27 +1,27 @@
 using System.Net;
 using System.Text;
 using System.Text.Json;
-using WebDevelopment.Common.Requests.User;
+using WebDevelopment.Common.Requests.Task;
 
 namespace WebDevelopment.API.Tests.IntegrationTests;
 
 [Collection("WebApplicationFactory collection")]
-public class UserControllerTests
+public class TaskControllerTests
 {
     private readonly WebApplicationFactorySetupMock _setupMock;
     private readonly HttpClient _client;
 
-    public UserControllerTests(WebApplicationFactorySetupMock setupMock)
+    public TaskControllerTests(WebApplicationFactorySetupMock setupMock)
     {
         _setupMock = setupMock;
         _client = _setupMock.Setup();
-        _client.BaseAddress = new Uri("https://localhost/api/User/");
+        _client.BaseAddress = new Uri("https://localhost/api/Task/");
     }
 
     [Theory]
     [InlineData("")]
     [InlineData("1")]
-    [InlineData("test@example.com")]
+    [InlineData("sometext")]
     public async Task GetRequests_ReturnSuccess(string url)
     {
         //Arrange 
@@ -34,19 +34,6 @@ public class UserControllerTests
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
-    [Fact]
-    public async Task GetByIdRequest_404NotFound_WhenIdLessThanOne()
-    {
-        //Arrange 
-        var id = "-1";
-        //Act
-        var response = await _client.GetAsync(id);
-
-        //Assert
-        Assert.NotNull(response);
-        Assert.NotNull(response.Content);
-        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-    }
 
     [Fact]
     public async Task PostRequest_DoNotPassValidation_ReturnBadRequest()
@@ -55,7 +42,7 @@ public class UserControllerTests
 
         //Act
         var response = await _client.PostAsync("",
-            new StringContent(JsonSerializer.Serialize(new NewUserRequest()), Encoding.UTF8, "application/json"));
+            new StringContent(JsonSerializer.Serialize(new NewTaskRequest(){Name = "q", Description = "s"}), Encoding.UTF8, "application/json"));
 
         //Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -65,11 +52,11 @@ public class UserControllerTests
     public async Task PostRequest_PassValidation_ReturnOk()
     {
         // Arrange
-        var user = new NewUserRequest() { FirstName = "Test2", SecondName = "Test2", UserEmail = "test@test.test2" };
+        var task = new NewTaskRequest() { Name = "Test1", Description = "Test description should contain more than 20 letters"};
 
         //Act
         var response = await _client.PostAsync("",
-            new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json"));
+            new StringContent(JsonSerializer.Serialize(task), Encoding.UTF8, "application/json"));
 
         //Assert
         Assert.NotNull(response);
@@ -83,7 +70,7 @@ public class UserControllerTests
         // Arrange
         //Act
         var response = await _client.PutAsync("",
-            new StringContent(JsonSerializer.Serialize(new UserWithIdRequest()), Encoding.UTF8, "application/json"));
+            new StringContent(JsonSerializer.Serialize(new TaskWithIdRequest()), Encoding.UTF8, "application/json"));
 
         //Assert
         Assert.NotNull(response);
@@ -95,16 +82,17 @@ public class UserControllerTests
     public async Task PutRequest_PassValidation_ReturnOK()
     {
         // Arrange
-        var user = new UserWithIdRequest()
-        { Id = 1, FirstName = "Test", SecondName = "Test", UserEmail = "test@test.test" };
+        var task = new TaskWithIdRequest()
+        { Id = 1, Name = "Test", Description = "Test description should contain more than 20 letters" };
 
         //Act
         var response = await _client.PutAsync("",
-            new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json"));
+            new StringContent(JsonSerializer.Serialize(task), Encoding.UTF8, "application/json"));
 
         //Assert
         Assert.NotNull(response);
         Assert.NotNull(response.Content);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
+
 }

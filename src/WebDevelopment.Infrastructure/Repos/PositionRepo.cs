@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using WebDevelopment.Common.Requests.Position;
+﻿using WebDevelopment.Common.Requests.Position;
 using WebDevelopment.Domain.IRepos;
 using WebDevelopment.Infrastructure.Models;
 

@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using WebDevelopment.Common.Requests.Task;
+﻿using WebDevelopment.Common.Requests.Task;
 using WebDevelopment.Common.Requests.User;
 using WebDevelopment.Common.Requests.UserTask;
 using WebDevelopment.Domain.IRepos;

@@ -3,11 +3,8 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using Quartz;
-using Quartz.Core;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
-using Microsoft.Extensions.Logging;
 using WebDevelopment.API.Tests.Mocks;
 using WebDevelopment.Domain;
 
@@ -20,7 +17,7 @@ public class WebApplicationFactorySetupMock : IDisposable
     private HttpClient? _client;
     public HttpClient Setup()
     {
-        _unitOfWork.Setup_UserRepo();
+        _unitOfWork.Setup_UOW();
         _client = _factory.WithWebHostBuilder(
                 builder => builder.ConfigureTestServices(
                     services =>
@@ -33,10 +30,11 @@ public class WebApplicationFactorySetupMock : IDisposable
                         {
                             services.Remove(descriptor);
                         }
-
+                        
                         services.AddTransient(_ => _unitOfWork.Object);
                         services.AddAuthentication("Test")
                             .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("Test", _ => { });
+
                     }))
             .CreateClient();
         var token = Generate();
@@ -48,17 +46,20 @@ public class WebApplicationFactorySetupMock : IDisposable
     private string Generate()
     {
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("TwlLasrvrJ3bPXUk1BtP"));
+
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
 
         var token = new JwtSecurityToken("https://localhost:44328/",
             "https://localhost:44328/",
             null,
-            expires: DateTime.Now.AddMinutes(15),
+            expires: DateTime.Now.AddMinutes(2),
             signingCredentials: credentials);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
+
+    
 
     public void Dispose()
     {

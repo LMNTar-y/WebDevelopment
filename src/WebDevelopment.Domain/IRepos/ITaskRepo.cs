@@ -4,5 +4,5 @@ namespace WebDevelopment.Domain.IRepos;
 
 public interface ITaskRepo : IGenericRepository<ITaskRequest>
 {
-    Task<ITaskRequest> GetByName(string name);
+    Task<ITaskRequest> GetByNameAsync(string name);
 }

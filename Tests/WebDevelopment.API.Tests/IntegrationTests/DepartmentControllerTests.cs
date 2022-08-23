@@ -20,13 +20,26 @@ public class DepartmentControllerTests
 
     [Theory]
     [InlineData("")]
-    [InlineData("1")]
     [InlineData("SomeDep")]
     public async Task GetRequests_ReturnSuccess(string url)
     {
         //Arrange 
         //Act
         var response = await _client.GetAsync(url);
+
+        //Assert
+        Assert.NotNull(response);
+        Assert.NotNull(response.Content);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetByIdRequests_ReturnSuccess()
+    {
+        //Arrange 
+        var id = Guid.NewGuid();
+        //Act
+        var response = await _client.GetAsync(id.ToString());
 
         //Assert
         Assert.NotNull(response);

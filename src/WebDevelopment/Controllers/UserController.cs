@@ -24,9 +24,9 @@ public class UserController : ControllerBase
         try
         {
             var result = await _unitOfWork.UserRepo.GetAllAsync();
-            return Ok(new ResponseWrapper<IEnumerable<IUserRequest>>()
+            return Ok(new ResponseWrapper<IEnumerable<UserWithIdRequest>>()
             {
-                Result = result
+                Result = result.Cast<UserWithIdRequest>()
             });
         }
         catch (Exception ex)
@@ -47,9 +47,9 @@ public class UserController : ControllerBase
         try
         {
             var result = await _unitOfWork.UserRepo.GetByIdAsync(id);
-            return Ok(new ResponseWrapper<IUserRequest>()
+            return Ok(new ResponseWrapper<UserWithIdRequest>()
             {
-                Result = result
+                Result = (UserWithIdRequest)result
             });
         }
         catch (Exception ex)
@@ -70,9 +70,9 @@ public class UserController : ControllerBase
         try
         {
             var result = await _unitOfWork.UserRepo.GetUserByEmail(userEmail);
-            return Ok(new ResponseWrapper<IUserRequest>()
+            return Ok(new ResponseWrapper<UserWithIdRequest>()
             {
-                Result = result
+                Result = (UserWithIdRequest)result
             });
         }
         catch (Exception ex)

@@ -23,9 +23,9 @@ namespace WebDevelopment.API.Controllers
             try
             {
                 var result = await _unitOfWork.CountryRepo.GetAllAsync();
-                return Ok(new ResponseWrapper<IEnumerable<ICountryRequest>>()
+                return Ok(new ResponseWrapper<IEnumerable<CountryWithIdRequest>>()
                 {
-                    Result = result
+                    Result = result.Cast<CountryWithIdRequest>()
                 });
             }
             catch (Exception ex)
@@ -46,9 +46,9 @@ namespace WebDevelopment.API.Controllers
             try
             {
                 var result = await _unitOfWork.CountryRepo.GetByIdAsync(id);
-                return Ok(new ResponseWrapper<ICountryRequest>()
+                return Ok(new ResponseWrapper<CountryWithIdRequest>()
                 {
-                    Result = result
+                    Result = (CountryWithIdRequest)result
                 });
             }
             catch (Exception ex)
@@ -69,9 +69,9 @@ namespace WebDevelopment.API.Controllers
             try
             {
                 var result = await _unitOfWork.CountryRepo.GetByNameAsync(name);
-                return Ok(new ResponseWrapper<ICountryRequest>()
+                return Ok(new ResponseWrapper<CountryWithIdRequest>()
                 {
-                    Result = result
+                    Result = (CountryWithIdRequest)result
                 });
             }
             catch (Exception ex)

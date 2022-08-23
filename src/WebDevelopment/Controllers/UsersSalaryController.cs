@@ -23,9 +23,9 @@ public class UsersSalaryController : ControllerBase
         try
         {
             var result = await _unitOfWork.UserSalaryRepo.GetAllAsync();
-            return Ok(new ResponseWrapper<IEnumerable<IUserSalaryRequest>>()
+            return Ok(new ResponseWrapper<IEnumerable<UserSalaryWithIdRequest>>()
             {
-                Result = result
+                Result = result.Cast<UserSalaryWithIdRequest>()
             });
         }
         catch (Exception e)
@@ -49,9 +49,9 @@ public class UsersSalaryController : ControllerBase
         try
         {
             var result = await _unitOfWork.UserSalaryRepo.GetByIdAsync(id);
-            return Ok(new ResponseWrapper<IUserSalaryRequest>()
+            return Ok(new ResponseWrapper<UserSalaryWithIdRequest>()
             {
-                Result = result
+                Result = (UserSalaryWithIdRequest)result
             });
         }
         catch (Exception e)

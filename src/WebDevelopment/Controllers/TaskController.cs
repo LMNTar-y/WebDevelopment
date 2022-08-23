@@ -24,9 +24,9 @@ public class TaskController : ControllerBase
         try
         {
             var result = await _unitOfWork.TaskRepo.GetAllAsync();
-            return Ok(new ResponseWrapper<IEnumerable<ITaskRequest>>()
+            return Ok(new ResponseWrapper<IEnumerable<TaskWithIdRequest>>()
             {
-                Result = result
+                Result = result.Cast<TaskWithIdRequest>()
             });
         }
         catch (Exception ex)
@@ -47,9 +47,9 @@ public class TaskController : ControllerBase
         try
         {
             var result = await _unitOfWork.TaskRepo.GetByIdAsync(id);
-            return Ok(new ResponseWrapper<ITaskRequest>()
+            return Ok(new ResponseWrapper<TaskWithIdRequest>()
             {
-                Result = result
+                Result = (TaskWithIdRequest)result
             });
         }
         catch (Exception ex)
@@ -69,10 +69,10 @@ public class TaskController : ControllerBase
     {
         try
         {
-            var result = await _unitOfWork.TaskRepo.GetByName(name);
-            return Ok(new ResponseWrapper<ITaskRequest>()
+            var result = await _unitOfWork.TaskRepo.GetByNameAsync(name);
+            return Ok(new ResponseWrapper<TaskWithIdRequest>()
             {
-                Result = result
+                Result = (TaskWithIdRequest)result
             });
         }
         catch (Exception ex)

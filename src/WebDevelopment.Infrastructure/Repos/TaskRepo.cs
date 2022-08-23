@@ -22,7 +22,7 @@ public class TaskRepo : GenericRepository<Task>, ITaskRepo
         return Map(task);
     }
 
-    public async Task<ITaskRequest> GetByName(string name)
+    public async Task<ITaskRequest> GetByNameAsync(string name)
     {
         var result = (await base.GetAllAsync()).FirstOrDefault(t => string.Equals(t.Name, name, StringComparison.CurrentCultureIgnoreCase)) ??
                      throw new ArgumentNullException(nameof(name), $"Task with name:\"{name}\" has not fount in the DataBase");

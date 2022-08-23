@@ -25,9 +25,9 @@ public class DepartmentController : ControllerBase
         try
         {
             var result = await _unitOfWork.DepartmentRepo.GetAllAsync();
-            return Ok(new ResponseWrapper<IEnumerable<IDepartmentRequest>>()
+            return Ok(new ResponseWrapper<IEnumerable<DepartmentWithIdRequest>>()
             {
-                Result = result
+                Result = result.Cast<DepartmentWithIdRequest>()
             });
         }
         catch (Exception ex)
@@ -48,9 +48,9 @@ public class DepartmentController : ControllerBase
         try
         {
             var result = await _unitOfWork.DepartmentRepo.GetByIdAsync(id);
-            return Ok(new ResponseWrapper<IDepartmentRequest>()
+            return Ok(new ResponseWrapper<DepartmentWithIdRequest>()
             {
-                Result = result
+                Result = (DepartmentWithIdRequest)result
             });
         }
         catch (Exception ex)
@@ -71,9 +71,9 @@ public class DepartmentController : ControllerBase
         try
         {
             var result = await _unitOfWork.DepartmentRepo.GetByNameAsync(name);
-            return Ok(new ResponseWrapper<IDepartmentRequest>()
+            return Ok(new ResponseWrapper<DepartmentWithIdRequest>()
             {
-                Result = result
+                Result = (DepartmentWithIdRequest)result
             });
         }
         catch (Exception ex)

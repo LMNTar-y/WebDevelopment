@@ -29,7 +29,7 @@ public class SalaryRangeRepo : GenericRepository<SalaryRange>, ISalaryRangeRepo
         return Map(result);
     }
 
-    public async Task<IEnumerable<ISalaryRangeRequest>> GetByPositionNameAsync(string positionName)
+    public async Task<IEnumerable<ISalaryRangeRequest>> GetByNameAsync(string positionName)
     {
         var result = (await GetAllAsync())
                      .Where(s => !string.IsNullOrWhiteSpace(s.PositionName) && s.PositionName.Contains(positionName, StringComparison.CurrentCultureIgnoreCase)) ??

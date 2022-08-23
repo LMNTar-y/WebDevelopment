@@ -24,9 +24,9 @@ public class UserTaskController : ControllerBase
         try
         {
             var result = await _unitOfWork.UserTaskRepo.GetAllAsync();
-            return Ok(new ResponseWrapper<IEnumerable<IUserTaskRequest>>()
+            return Ok(new ResponseWrapper<IEnumerable<UserTaskWithIdRequest>>()
             {
-                Result = result
+                Result = result.Cast<UserTaskWithIdRequest>()
             });
         }
         catch (Exception e)
@@ -50,9 +50,9 @@ public class UserTaskController : ControllerBase
         try
         {
             var result = await _unitOfWork.UserTaskRepo.GetByIdAsync(id);
-            return Ok(new ResponseWrapper<IUserTaskRequest>()
+            return Ok(new ResponseWrapper<UserTaskWithIdRequest>()
             {
-                Result = result
+                Result = (UserTaskWithIdRequest)result
             });
         }
         catch (Exception e)

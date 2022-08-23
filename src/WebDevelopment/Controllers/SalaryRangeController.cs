@@ -25,9 +25,9 @@ public class SalaryRangeController : ControllerBase
         try
         {
             var result = await _unitOfWork.SalaryRangeRepo.GetAllAsync();
-            return Ok(new ResponseWrapper<IEnumerable<ISalaryRangeRequest>>()
+            return Ok(new ResponseWrapper<IEnumerable<SalaryRangeWithIdRequest>>()
             {
-                Result = result
+                Result = result.Cast<SalaryRangeWithIdRequest>()
             });
         }
         catch (Exception ex)
@@ -51,9 +51,9 @@ public class SalaryRangeController : ControllerBase
         try
         {
             var result = await _unitOfWork.SalaryRangeRepo.GetByIdAsync(id);
-            return Ok(new ResponseWrapper<ISalaryRangeRequest>()
+            return Ok(new ResponseWrapper<SalaryRangeWithIdRequest>()
             {
-                Result = result
+                Result = (SalaryRangeWithIdRequest)result
             });
         }
         catch (Exception ex)
@@ -72,14 +72,14 @@ public class SalaryRangeController : ControllerBase
     }
 
     [HttpGet("{positionName}")]
-    public async Task<ActionResult> GetSalaryRangeById(string positionName)
+    public async Task<ActionResult> GetByPositionName(string positionName)
     {
         try
         {
-            var result = await _unitOfWork.SalaryRangeRepo.GetByPositionNameAsync(positionName);
-            return Ok(new ResponseWrapper<IEnumerable<ISalaryRangeRequest>>()
+            var result = await _unitOfWork.SalaryRangeRepo.GetByNameAsync(positionName);
+            return Ok(new ResponseWrapper<IEnumerable<SalaryRangeWithIdRequest>>()
             {
-                Result = result
+                Result = result.Cast<SalaryRangeWithIdRequest>()
             });
         }
         catch (Exception ex)

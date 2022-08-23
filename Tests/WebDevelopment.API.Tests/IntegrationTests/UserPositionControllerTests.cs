@@ -1,27 +1,30 @@
 using System.Net;
 using System.Text;
 using System.Text.Json;
+using WebDevelopment.Common.Requests.Department;
+using WebDevelopment.Common.Requests.Position;
 using WebDevelopment.Common.Requests.User;
+using WebDevelopment.Common.Requests.UserPosition;
 
 namespace WebDevelopment.API.Tests.IntegrationTests;
 
 [Collection("WebApplicationFactory collection")]
-public class UserControllerTests
+public class UserPositionControllerTests
 {
     private readonly WebApplicationFactorySetupMock _setupMock;
     private readonly HttpClient _client;
 
-    public UserControllerTests(WebApplicationFactorySetupMock setupMock)
+    public UserPositionControllerTests(WebApplicationFactorySetupMock setupMock)
     {
         _setupMock = setupMock;
         _client = _setupMock.Setup();
-        _client.BaseAddress = new Uri("https://localhost/api/User/");
+        _client.BaseAddress = new Uri("https://localhost/api/UserPosition/");
     }
 
     [Theory]
     [InlineData("")]
     [InlineData("1")]
-    [InlineData("test@example.com")]
+    [InlineData("sometext/sometext")]
     public async Task GetRequests_ReturnSuccess(string url)
     {
         //Arrange 
@@ -34,19 +37,6 @@ public class UserControllerTests
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
-    [Fact]
-    public async Task GetByIdRequest_404NotFound_WhenIdLessThanOne()
-    {
-        //Arrange 
-        var id = "-1";
-        //Act
-        var response = await _client.GetAsync(id);
-
-        //Assert
-        Assert.NotNull(response);
-        Assert.NotNull(response.Content);
-        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-    }
 
     [Fact]
     public async Task PostRequest_DoNotPassValidation_ReturnBadRequest()
@@ -55,7 +45,7 @@ public class UserControllerTests
 
         //Act
         var response = await _client.PostAsync("",
-            new StringContent(JsonSerializer.Serialize(new NewUserRequest()), Encoding.UTF8, "application/json"));
+            new StringContent(JsonSerializer.Serialize(new NewUserPositionRequest()), Encoding.UTF8, "application/json"));
 
         //Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -65,11 +55,11 @@ public class UserControllerTests
     public async Task PostRequest_PassValidation_ReturnOk()
     {
         // Arrange
-        var user = new NewUserRequest() { FirstName = "Test2", SecondName = "Test2", UserEmail = "test@test.test2" };
+        var pos = new NewUserPositionRequest() { User = new UserWithIdRequest(), Position = new PositionWithIdRequest(), Department = new NewDepartmentRequest()};
 
         //Act
         var response = await _client.PostAsync("",
-            new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json"));
+            new StringContent(JsonSerializer.Serialize(pos), Encoding.UTF8, "application/json"));
 
         //Assert
         Assert.NotNull(response);
@@ -81,9 +71,10 @@ public class UserControllerTests
     public async Task PutRequest_DoNotPassValidation_ReturnBadRequest()
     {
         // Arrange
+        var pos = new NewUserPositionRequest();
         //Act
         var response = await _client.PutAsync("",
-            new StringContent(JsonSerializer.Serialize(new UserWithIdRequest()), Encoding.UTF8, "application/json"));
+            new StringContent(JsonSerializer.Serialize(pos), Encoding.UTF8, "application/json"));
 
         //Assert
         Assert.NotNull(response);
@@ -95,16 +86,17 @@ public class UserControllerTests
     public async Task PutRequest_PassValidation_ReturnOK()
     {
         // Arrange
-        var user = new UserWithIdRequest()
-        { Id = 1, FirstName = "Test", SecondName = "Test", UserEmail = "test@test.test" };
+        var pos = new UserPositionWithIdRequest()
+        { Id = 1, User = new UserWithIdRequest(), Position = new PositionWithIdRequest(), Department = new NewDepartmentRequest() };
 
         //Act
         var response = await _client.PutAsync("",
-            new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json"));
+            new StringContent(JsonSerializer.Serialize(pos), Encoding.UTF8, "application/json"));
 
         //Assert
         Assert.NotNull(response);
         Assert.NotNull(response.Content);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
+
 }

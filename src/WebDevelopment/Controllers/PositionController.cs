@@ -24,9 +24,9 @@ public class PositionController : ControllerBase
         try
         {
             var result = await _unitOfWork.PositionRepo.GetAllAsync();
-            return Ok(new ResponseWrapper<IEnumerable<IPositionRequest>>()
+            return Ok(new ResponseWrapper<IEnumerable<PositionWithIdRequest>>()
             {
-                Result = result
+                Result = result.Cast<PositionWithIdRequest>()
             });
         }
         catch (Exception ex)
@@ -47,9 +47,9 @@ public class PositionController : ControllerBase
         try
         {
             var result = await _unitOfWork.PositionRepo.GetByIdAsync(id);
-            return Ok(new ResponseWrapper<IPositionRequest>()
+            return Ok(new ResponseWrapper<PositionWithIdRequest>()
             {
-                Result = result
+                Result = (PositionWithIdRequest)result
             });
         }
         catch (Exception ex)
@@ -70,9 +70,9 @@ public class PositionController : ControllerBase
         try
         {
             var result = await _unitOfWork.PositionRepo.GetByNameAsync(name);
-            return Ok(new ResponseWrapper<IPositionRequest>()
+            return Ok(new ResponseWrapper<PositionWithIdRequest>()
             {
-                Result = result
+                Result = (PositionWithIdRequest)result
             });
         }
         catch (Exception ex)

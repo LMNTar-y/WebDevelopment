@@ -35,6 +35,20 @@ public class CountryControllerTests
     }
 
     [Fact]
+    public async Task GetByIdRequests_404NotFound_WhenIdLessThanOne()
+    {
+        //Arrange 
+        var id = "-1";
+        //Act
+        var response = await _client.GetAsync(id);
+
+        //Assert
+        Assert.NotNull(response);
+        Assert.NotNull(response.Content);
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Fact]
     public async Task PostRequest_DoNotPassValidation_ReturnBadRequest()
     {
         // Arrange
