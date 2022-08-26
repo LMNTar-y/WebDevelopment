@@ -18,7 +18,7 @@ public class LoginController : ControllerBase
         _loginService = loginService;
     }
 
-    //[AllowAnonymous]
+    [AllowAnonymous]
     [HttpPost()]
     public async Task<IActionResult> Login([FromBody] UserLogin userLogin)
     {

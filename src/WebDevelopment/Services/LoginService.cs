@@ -53,11 +53,12 @@ public class LoginService : ILoginService
 
         var claims = new[]
         {
-            new Claim(ClaimTypes.NameIdentifier, user.UserName!),
+            new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()!),
+            new Claim(ClaimTypes.GivenName, user.UserName!),
             new Claim(ClaimTypes.Role, user.Role.ToString()),
             new Claim(ClaimTypes.Name, user.User!.FirstName!),
             new Claim(ClaimTypes.Surname, user.User.SecondName!),
-            new Claim(ClaimTypes.Email, user.User.UserEmail!)
+            new Claim(ClaimTypes.Email, user.UserEmail!)
         };
 
         var token = new JwtSecurityToken(_configuration["Jwt:Issuer"],

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 using WebDevelopment.API.Tests.Mocks;
 using WebDevelopment.Domain;
@@ -49,10 +50,14 @@ public class WebApplicationFactorySetupMock : IDisposable
 
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
+        var claims = new[]
+        {
+            new Claim(ClaimTypes.Role, "Admin"),
+        };
 
         var token = new JwtSecurityToken("https://localhost:44328/",
             "https://localhost:44328/",
-            null,
+            claims,
             expires: DateTime.Now.AddMinutes(2),
             signingCredentials: credentials);
 

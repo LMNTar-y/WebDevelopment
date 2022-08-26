@@ -18,7 +18,7 @@ public class CountryRepo : GenericRepository<Country>, ICountryRepo
 
     public new async Task<ICountryRequest> GetByIdAsync(object id)
     {
-        if (id == null || (int)id < 1)
+        if (id is < 1)
         {
             throw new ArgumentOutOfRangeException(nameof(id), "Id in the request should be more than 0");
         }

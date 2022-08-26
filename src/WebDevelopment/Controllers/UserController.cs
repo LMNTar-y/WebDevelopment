@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using WebDevelopment.Common.Requests.User;
 using WebDevelopment.Domain;
 
@@ -8,7 +9,7 @@ namespace WebDevelopment.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,User")]
 public class UserController : ControllerBase
 {
     private readonly IUnitOfWork _unitOfWork;
@@ -21,6 +22,13 @@ public class UserController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAllUsers()
     {
+        // or just like this - if (string.Equals(User.FindFirst(ClaimTypes.Role)?.Value, "User", StringComparison.Ordinal))
+        if (HttpContext.User.Identity is ClaimsIdentity identity && string.Equals(identity.FindFirst(ClaimTypes.Role)?.Value, "User", StringComparison.Ordinal))
+        {
+            int.TryParse(identity.FindFirst(ClaimTypes.NameIdentifier)?.Value, out int id);
+            return await GetById(id);
+        }
+
         try
         {
             var result = await _unitOfWork.UserRepo.GetAllAsync();
@@ -42,6 +50,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("{id:int}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetById(int id)
     {
         try
@@ -65,6 +74,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("{userEmail}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetUserByEmail(string userEmail)
     {
         try
@@ -88,6 +98,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> SaveAsync([FromBody] NewUserRequest userRequest)
     {
         try
@@ -111,6 +122,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPut]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> UpdateAsync([FromBody] UserWithIdRequest userWithIdRequest)
     {
         try

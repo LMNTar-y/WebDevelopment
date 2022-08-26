@@ -54,7 +54,7 @@ public class PositionController : ControllerBase
         }
         catch (Exception ex)
         {
-            return StatusCode(StatusCodes.Status400BadRequest, new ResponseWrapper<object>()
+            return StatusCode(StatusCodes.Status404NotFound, new ResponseWrapper<object>()
             {
                 Errors = new List<Error>()
                 {

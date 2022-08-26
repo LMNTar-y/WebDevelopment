@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebDevelopment.Common.Requests.Country;
@@ -8,7 +9,7 @@ namespace WebDevelopment.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,User")]
     public class CountryController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -39,7 +40,7 @@ namespace WebDevelopment.API.Controllers
                 });
             }
         }
-
+        
         [HttpGet("{id:int}")]
         public async Task<ActionResult> GetCountryById(int id)
         {
