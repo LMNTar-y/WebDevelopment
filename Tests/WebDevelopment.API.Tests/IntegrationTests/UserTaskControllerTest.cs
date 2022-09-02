@@ -51,7 +51,7 @@ public class UserTaskControllerTest
     }
 
     [Fact]
-    public async Task PostRequest_PassValidation_ReturnOk()
+    public async Task PostRequest_PassValidation_ReturnCreated()
     {
         // Arrange
         var userTask = new NewUserTaskRequest()
@@ -67,7 +67,7 @@ public class UserTaskControllerTest
         //Assert
         Assert.NotNull(response);
         Assert.NotNull(response.Content);
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
     }
 
     [Fact]

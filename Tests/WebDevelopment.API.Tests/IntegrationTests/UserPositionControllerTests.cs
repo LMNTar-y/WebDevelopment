@@ -52,7 +52,7 @@ public class UserPositionControllerTests
     }
 
     [Fact]
-    public async Task PostRequest_PassValidation_ReturnOk()
+    public async Task PostRequest_PassValidation_ReturnCreated()
     {
         // Arrange
         var pos = new NewUserPositionRequest() { User = new UserWithIdRequest(), Position = new PositionWithIdRequest(), Department = new NewDepartmentRequest()};
@@ -64,7 +64,7 @@ public class UserPositionControllerTests
         //Assert
         Assert.NotNull(response);
         Assert.NotNull(response.Content);
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
     }
 
     [Fact]

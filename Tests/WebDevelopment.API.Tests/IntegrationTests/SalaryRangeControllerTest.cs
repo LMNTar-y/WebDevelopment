@@ -50,7 +50,7 @@ public class SalaryRangeControllerTest
     }
 
     [Fact]
-    public async Task PostRequest_PassValidation_ReturnOk()
+    public async Task PostRequest_PassValidation_ReturnCreated()
     {
         // Arrange
         var pos = new NewSalaryRangeRequest() { StartRange = 500, FinishRange = 1000, CountryName = "somename", PositionName = "somename"};
@@ -62,7 +62,7 @@ public class SalaryRangeControllerTest
         //Assert
         Assert.NotNull(response);
         Assert.NotNull(response.Content);
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
     }
 
     [Fact]

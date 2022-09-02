@@ -103,7 +103,7 @@ public class UserPositionController : ControllerBase
         try
         {
             var result = await _unitOfWork.UserPositionRepo.AddAsync(userPosition);
-            return Ok(new ResponseWrapper<object>()
+            return StatusCode(StatusCodes.Status201Created, new ResponseWrapper<object>()
             {
                 Result = result
             });

@@ -51,7 +51,7 @@ public class UsersSalaryControllerTest
     }
 
     [Fact]
-    public async Task PostRequest_PassValidation_ReturnOk()
+    public async Task PostRequest_PassValidation_ReturnCreated()
     {
         // Arrange
         var userSalary = new NewUserSalaryRequest() { Salary = 1000, User = new NewUserRequest() };
@@ -63,7 +63,7 @@ public class UsersSalaryControllerTest
         //Assert
         Assert.NotNull(response);
         Assert.NotNull(response.Content);
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
     }
 
     [Fact]

@@ -76,7 +76,7 @@ public class UserTaskController : ControllerBase
         try
         {
             var result = await _unitOfWork.UserTaskRepo.AddAsync(userSalaryRequest);
-            return Ok(new ResponseWrapper<object>()
+            return StatusCode(StatusCodes.Status201Created, new ResponseWrapper<object>()
             {
                 Result = result
             });

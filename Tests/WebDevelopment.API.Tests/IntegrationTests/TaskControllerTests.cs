@@ -49,7 +49,7 @@ public class TaskControllerTests
     }
 
     [Fact]
-    public async Task PostRequest_PassValidation_ReturnOk()
+    public async Task PostRequest_PassValidation_ReturnCreated()
     {
         // Arrange
         var task = new NewTaskRequest() { Name = "Test1", Description = "Test description should contain more than 20 letters"};
@@ -61,7 +61,7 @@ public class TaskControllerTests
         //Assert
         Assert.NotNull(response);
         Assert.NotNull(response.Content);
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
     }
 
     [Fact]

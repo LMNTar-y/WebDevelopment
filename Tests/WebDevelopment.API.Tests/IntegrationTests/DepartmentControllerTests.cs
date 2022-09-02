@@ -61,7 +61,7 @@ public class DepartmentControllerTests
     }
 
     [Fact]
-    public async Task PostRequest_PassValidation_ReturnOk()
+    public async Task PostRequest_PassValidation_ReturnCreated()
     {
         // Arrange
         var dep = new NewDepartmentRequest() { Name = "Test2"};
@@ -73,7 +73,7 @@ public class DepartmentControllerTests
         //Assert
         Assert.NotNull(response);
         Assert.NotNull(response.Content);
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
     }
 
     [Fact]

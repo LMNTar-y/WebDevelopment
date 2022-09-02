@@ -97,7 +97,7 @@ public class DepartmentController : ControllerBase
         try
         {
             var result = await _unitOfWork.DepartmentRepo.AddAsync(department);
-            return Ok(new ResponseWrapper<object>()
+            return StatusCode(StatusCodes.Status201Created,new ResponseWrapper<object>()
             {
                 Result = result
             });

@@ -50,7 +50,7 @@ public class PositionControllerTest
     }
 
     [Fact]
-    public async Task PostRequest_PassValidation_ReturnOk()
+    public async Task PostRequest_PassValidation_ReturnCreated()
     {
         // Arrange
         var pos = new NewPositionRequest() { Name = "Test2", ShortName = "test2"};
@@ -62,7 +62,7 @@ public class PositionControllerTest
         //Assert
         Assert.NotNull(response);
         Assert.NotNull(response.Content);
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
     }
 
     [Fact]

@@ -62,7 +62,7 @@ public class CountryControllerTests
     }
 
     [Fact]
-    public async Task PostRequest_PassValidation_ReturnOk()
+    public async Task PostRequest_PassValidation_ReturnCreated()
     {
         // Arrange
         var coun = new NewCountryRequest() { Name = "Test2", Alpha3Code = "ase"};
@@ -74,7 +74,7 @@ public class CountryControllerTests
         //Assert
         Assert.NotNull(response);
         Assert.NotNull(response.Content);
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
     }
 
     [Fact]

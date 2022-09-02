@@ -104,7 +104,7 @@ public class SalaryRangeController : ControllerBase
         try
         {
             var result = await _unitOfWork.SalaryRangeRepo.AddAsync(salaryRange);
-            return Ok(new ResponseWrapper<object>()
+            return StatusCode(StatusCodes.Status201Created, new ResponseWrapper<object>()
             {
                 Result = result
             });

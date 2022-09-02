@@ -48,7 +48,7 @@ public class LoginController : ControllerBase
         try
         {
             var result = await _loginService.RegisterAsync(userLogin);
-            return Ok(new ResponseWrapper<object>()
+            return StatusCode(StatusCodes.Status201Created, new ResponseWrapper<object>()
             {
                 Result = result
             });

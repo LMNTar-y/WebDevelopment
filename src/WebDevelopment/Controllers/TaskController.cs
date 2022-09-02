@@ -93,7 +93,7 @@ public class TaskController : ControllerBase
         try
         {
             var result = await _unitOfWork.TaskRepo.AddAsync(task);
-            return Ok(new ResponseWrapper<object>()
+            return StatusCode(StatusCodes.Status201Created, new ResponseWrapper<object>()
             {
                 Result = result
             });

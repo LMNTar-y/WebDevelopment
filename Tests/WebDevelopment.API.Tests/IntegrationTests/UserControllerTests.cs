@@ -62,7 +62,7 @@ public class UserControllerTests
     }
 
     [Fact]
-    public async Task PostRequest_PassValidation_ReturnOk()
+    public async Task PostRequest_PassValidation_ReturnCreated()
     {
         // Arrange
         var user = new NewUserRequest() { FirstName = "Test2", SecondName = "Test2", UserEmail = "test@test.test2" };
@@ -74,7 +74,7 @@ public class UserControllerTests
         //Assert
         Assert.NotNull(response);
         Assert.NotNull(response.Content);
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
     }
 
     [Fact]

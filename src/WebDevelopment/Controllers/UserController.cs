@@ -104,7 +104,7 @@ public class UserController : ControllerBase
         try
         {
             var result = await _unitOfWork.UserRepo.AddAsync(userRequest);
-            return Ok(new ResponseWrapper<object>()
+            return StatusCode(StatusCodes.Status201Created, new ResponseWrapper<object>()
             {
                 Result = result
             });

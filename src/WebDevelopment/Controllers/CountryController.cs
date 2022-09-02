@@ -93,9 +93,10 @@ namespace WebDevelopment.API.Controllers
             try
             {
                 var result = await _unitOfWork.CountryRepo.AddAsync(newCountry);
-                return Ok(new ResponseWrapper<object>()
+                return StatusCode(StatusCodes.Status201Created, new ResponseWrapper<object>()
                 {
                     Result = result
+
                 });
             }
             catch (Exception ex)
