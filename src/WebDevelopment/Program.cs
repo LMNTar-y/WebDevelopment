@@ -2,6 +2,7 @@ using System.Text;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -19,6 +20,7 @@ using WebDevelopment.Infrastructure;
 using WebDevelopment.Domain;
 using WebDevelopment.Infrastructure.Repos;
 using WebDevelopment.API.Services;
+using WebDevelopment.API.Swagger;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,56 +35,8 @@ builder.Services.AddDbContext<WebDevelopmentContext>(
     options.UseSqlServer(builder.Configuration["ConnectionStrings:DefaultConnection"])
     );
 
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Title = "WebDevelopment API",
-        Version = "v1"
-    });
-    c.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
-    {
-        In = ParameterLocation.Header,
-        Description = "Please insert ApiKey into the field",
-        Name = "Authorization",
-        Scheme = "ApiKey",
-        Type = SecuritySchemeType.ApiKey
-    });
-
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
-    {
-        In = ParameterLocation.Header,
-        Type = SecuritySchemeType.Http,
-        Scheme = "Bearer",
-        Description = "Input bearer token to access this API",
-    });
-
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "ApiKey"
-                }
-            },
-            new string[] {}
-        },
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            new[] { "WebDevelopment API" }
-        }
-    });
-});
+builder.Services.AddVersioning();
+builder.Services.AddSwagger();
 
 builder.Services.AddAuthorization();
 
@@ -133,8 +87,8 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    var versions = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
+    app.UseSwagger(versions);
 }
 
 app.UseAuthentication();

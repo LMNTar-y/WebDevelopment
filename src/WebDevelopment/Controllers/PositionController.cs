@@ -6,7 +6,8 @@ using WebDevelopment.Domain;
 
 namespace WebDevelopment.API.Controllers;
 
-[Route("api/[controller]")]
+[ApiVersion("2.0")]
+[Route("api/v{version:apiVersion}/[controller]")]
 [ApiController]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class PositionController : ControllerBase

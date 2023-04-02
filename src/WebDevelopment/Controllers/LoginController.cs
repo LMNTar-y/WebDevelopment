@@ -6,6 +6,11 @@ using WebDevelopment.Domain;
 
 namespace WebDevelopment.API.Controllers;
 
+/// <summary>
+/// The only controller in v1. To find other please choose v2.
+/// </summary>
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/[controller]")]
 [Route("api/[controller]")]
 [ApiController]
 [Authorize(AuthenticationSchemes = "ApiKey")]
@@ -18,6 +23,15 @@ public class LoginController : ControllerBase
         _loginService = loginService;
     }
 
+    /// <summary>
+    /// It is used for getting bearer token for login in other controllers 
+    /// </summary>
+    /// <remarks>It is user for getting bearer token for login in other controllers </remarks>
+    /// <param name="userLogin">UserName and Password</param>
+    /// <response code="200">Ok. Token</response>
+    /// <response code="400">Incorrect request</response>
+    /// <response code="404">User not found</response>
+    /// <returns>Bearer token</returns>
     [AllowAnonymous]
     [HttpPost()]
     public async Task<IActionResult> Login([FromBody] UserLogin userLogin)
@@ -42,6 +56,15 @@ public class LoginController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Register a new user
+    /// </summary>
+    /// <remarks>Register a new user</remarks>
+    /// <param name="userLogin">UserName, Password and email</param>
+    /// <response code="201">Created</response>
+    /// <response code="400">Incorrect request</response>
+    /// <returns>Bearer token</returns>
+    [ProducesResponseType(201)]
     [HttpPost("Register")]
     public async Task<IActionResult> Register([FromBody] NewUserLogin userLogin)
     {
